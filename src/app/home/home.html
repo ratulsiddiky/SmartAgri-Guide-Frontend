@@ -1,1 +1,58 @@
-<p>home works!</p>
+<div class="container mt-5">
+
+  <!-- Hero -->
+  <div class="text-center py-5">
+    <h1 class="display-4 text-success fw-bold">🌾 Welcome to SmartAgri Guide</h1>
+    <p class="lead text-muted mt-3 mb-4">
+      Monitor your farms, track live weather, manage IoT sensors, and receive
+      real-time disaster alerts — all from one dashboard.
+    </p>
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+      <a routerLink="/farms" class="btn btn-success btn-lg">🚜 View All Farms</a>
+      <a routerLink="/businesses" class="btn btn-outline-success btn-lg">🔍 Search Farms</a>
+      @if (!api.isLoggedIn()) {
+        <a routerLink="/login" class="btn btn-outline-secondary btn-lg">🔑 Login</a>
+      }
+    </div>
+  </div>
+
+  <hr class="my-5">
+
+  <!-- Feature cards -->
+  <div class="row g-4 mb-5">
+    <div class="col-md-4">
+      <div class="card border-success shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title text-success">🌤️ Live Weather Tracking</h5>
+          <p class="card-text text-muted">
+            Sync real-time weather data from Open-Meteo directly into your
+            farm record for historical trend analysis.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-success shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title text-success">📡 IoT Sensor Monitoring</h5>
+          <p class="card-text text-muted">
+            Connect soil moisture, temperature and humidity sensors to get
+            live crop health readings and irrigation alerts.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-success shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title text-success">⚠️ Geo-Targeted Alerts</h5>
+          <p class="card-text text-muted">
+            Receive automated emergency alerts for floods, frost and wildfires
+            targeted to your farm's exact GPS location.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

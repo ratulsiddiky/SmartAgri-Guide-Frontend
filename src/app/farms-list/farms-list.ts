@@ -1,22 +1,33 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router'; // 1. Import RouterLink here
-import { ApiService } from '../api'; 
+import { RouterLink } from '@angular/router';
+import { ApiService } from '../api';
 
 @Component({
   selector: 'app-farms-list',
   standalone: true,
-  imports: [CommonModule, RouterLink], // 2. Add it to the imports array here!
-  templateUrl: './farms-list.html'
+  imports: [CommonModule, RouterLink],
+  templateUrl: './farms-list.html',
+  styleUrl: './farms-list.css',
 })
 export class FarmsList implements OnInit {
-  farms: any[] = []; 
+  farms: any[] = [];
+  loading = true;
+  error = false;
 
   constructor(private api: ApiService) {}
 
   ngOnInit() {
-    this.api.getFarms().subscribe((data: any) => {
-      this.farms = data;
+    this.api.getFarms().subscribe({
+      next: (data: any) => {
+        this.farms = data;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Failed to load farms:', err);
+        this.error = true;
+        this.loading = false;
+      },
     });
   }
 }

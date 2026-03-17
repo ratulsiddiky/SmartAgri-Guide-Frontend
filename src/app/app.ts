@@ -1,12 +1,29 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core';
+import { RouterOutlet, RouterLink, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { ApiService } from './api';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [RouterOutlet, RouterLink, CommonModule],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css',
 })
 export class App {
-  protected readonly title = signal('smart-agri-fe');
+  constructor(public api: ApiService, private router: Router) {}
+
+  logout() {
+    this.api.logout().subscribe({
+      next: () => this.clearSession(),
+      error: () => this.clearSession(),
+    });
+  }
+
+  private clearSession() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('role');
+    this.router.navigate(['/login']);
+  }
 }

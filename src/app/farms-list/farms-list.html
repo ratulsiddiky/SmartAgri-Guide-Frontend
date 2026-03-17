@@ -1,44 +1,64 @@
 <div class="container mt-4">
   <h2 class="mb-4 text-success">🚜 Registered Farms</h2>
-  
+
+  @if (loading) {
+    <div class="alert alert-info shadow-sm">⏳ Loading farm data...</div>
+  }
+
+  @if (error) {
+    <div class="alert alert-danger shadow-sm">
+      ❌ Could not connect to the server. Please make sure the backend is running on port 5001.
+    </div>
+  }
+
   <div class="row">
-    @for (farm of farms; track $index) {
+    @for (farm of farms; track farm._id) {
       <div class="col-md-4 mb-4">
-        <div class="card shadow-sm border-success h-100"> 
-          
+        <div class="card shadow-sm border-success h-100">
+
           <div class="card-body">
             <h5 class="card-title text-success">{{ farm.farm_name }}</h5>
-            <h6 class="card-subtitle mb-3 text-muted">Crop: {{ farm.crop_type }}</h6>
-            
+            <h6 class="card-subtitle mb-3 text-muted">
+              🌾 Crop: {{ farm.crop_type || 'Not specified' }}
+            </h6>
+
             <ul class="list-group list-group-flush mb-3">
               <li class="list-group-item px-0">
-                <strong>⚠️ Status:</strong> 
+                <strong>⚠️ Alert Status:</strong>
                 @if (farm.alerts_history && farm.alerts_history.length > 0) {
-                    <span class="badge bg-danger">
-                    {{ farm.alerts_history[0].alert_type || 'Active' }} Alert
-                    </span>
+                  <span class="badge bg-danger ms-2">
+                    {{ farm.alerts_history[0].alert_type }} Alert
+                  </span>
                 } @else {
-                    <span class="badge bg-success">All Clear</span>
+                  <span class="badge bg-success ms-2">All Clear</span>
                 }
               </li>
+              <li class="list-group-item px-0">
+                <strong>📡 Sensors:</strong>
+                <span class="badge bg-secondary ms-2">
+                  {{ farm.sensors?.length || 0 }} active
+                </span>
+              </li>
             </ul>
-            
           </div>
-          
+
           <div class="card-footer bg-white border-top-0">
-            <button class="btn btn-outline-success w-100" [routerLink]="['/farms', farm._id]">
-              View Full Dashboard
-            </button>
+            <a class="btn btn-outline-success w-100"
+              [routerLink]="['/farms', farm._id]">
+              View Full Dashboard →
+            </a>
           </div>
 
         </div>
       </div>
     } @empty {
-      <div class="col-12">
-        <div class="alert alert-info shadow-sm">
-          Loading farm data from the server...
+      @if (!loading && !error) {
+        <div class="col-12">
+          <div class="alert alert-warning shadow-sm">
+            No farms registered yet.
+          </div>
         </div>
-      </div>
+      }
     }
   </div>
 </div>
