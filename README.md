@@ -1,6 +1,34 @@
-# SmartAgriFe
+# SmartAgri-Guide Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.2.
+Angular frontend for SmartAgri-Guide, built with Angular (standalone components).
+
+## Project structure (high level)
+
+```
+src/
+  app/
+    app.config.ts
+    app.component.ts
+    app.routes.ts
+    components/
+      auth/
+        login/
+        register/
+      dashboard/
+      farms/
+    services/
+    models/
+    guards/
+    interceptors/
+  environments/
+    environment.ts
+    environment.prod.ts
+```
+
+## Configure API base URL
+
+- **Dev**: edit `src/environments/environment.ts`
+- **Prod**: edit `src/environments/environment.prod.ts`
 
 ## Development server
 
