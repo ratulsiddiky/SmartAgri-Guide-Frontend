@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { ApiService } from '../../../services/api.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -17,9 +17,12 @@ export class Login {
   errorMessage = '';
   loading = false;
 
-  constructor(private api: ApiService, private router: Router) {
-    if (this.api.isLoggedIn()) {
-      this.router.navigate(['/farms']);
+  constructor(
+    private readonly authService: AuthService,
+    private readonly router: Router
+  ) {
+    if (this.authService.isAuthenticated()) {
+      void this.router.navigate(['/farms']);
     }
   }
 
@@ -32,12 +35,10 @@ export class Login {
     this.loading = true;
     this.errorMessage = '';
 
-    this.api.login(this.username, this.password).subscribe({
-      next: (data: any) => {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('username', data.username);
-        localStorage.setItem('role', data.role);
-        this.router.navigate(['/farms']);
+    this.authService.login(this.username, this.password).subscribe({
+      next: () => {
+        this.loading = false;
+        void this.router.navigate(['/farms']);
       },
       error: (err) => {
         this.loading = false;

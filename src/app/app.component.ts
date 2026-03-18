@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
-import { ApiService } from './services/api.service';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -11,20 +11,18 @@ import { ApiService } from './services/api.service';
   styleUrl: './app.css',
 })
 export class AppComponent {
-  constructor(public api: ApiService, private router: Router) {}
+  constructor(
+    public auth: AuthService,
+    private readonly router: Router
+  ) {}
 
   logout() {
-    this.api.logout().subscribe({
-      next: () => this.clearSession(),
-      error: () => this.clearSession(),
+    this.auth.logout().subscribe({
+      next: () => void this.router.navigate(['/login']),
+      error: () => {
+        this.auth.clearSession();
+        void this.router.navigate(['/login']);
+      },
     });
   }
-
-  private clearSession() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    localStorage.removeItem('role');
-    this.router.navigate(['/login']);
-  }
 }
-

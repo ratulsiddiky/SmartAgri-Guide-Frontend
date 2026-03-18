@@ -2,7 +2,20 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ApiService } from '../../../services/api.service';
+import { Farm, FarmSensor } from '../../../models/farm.model';
+import { FarmService } from '../../../services/farm.service';
+
+interface FarmInsights {
+  average_temp?: number;
+  average_wind?: number;
+  [key: string]: unknown;
+}
+
+interface IrrigationStatus {
+  status?: string;
+  moisture?: number;
+  [key: string]: unknown;
+}
 
 @Component({
   selector: 'app-farm-detail',
@@ -12,9 +25,9 @@ import { ApiService } from '../../../services/api.service';
   styleUrl: './farm-detail.css',
 })
 export class FarmDetail implements OnInit {
-  farm: any = null;
-  insights: any = null;
-  irrigation: any = null;
+  farm: Farm | null = null;
+  insights: FarmInsights | null = null;
+  irrigation: IrrigationStatus | null = null;
   loading = true;
   error = false;
 
@@ -22,10 +35,13 @@ export class FarmDetail implements OnInit {
   syncMessage = '';
 
   showSensorForm = false;
-  newSensor = { sensor_id: '', type: '' };
+  newSensor: FarmSensor = { sensor_id: '', type: '' };
   sensorMessage = '';
 
-  constructor(private route: ActivatedRoute, public api: ApiService) {}
+  constructor(
+    private readonly route: ActivatedRoute,
+    private readonly farmService: FarmService
+  ) {}
 
   get farmId(): string {
     return this.route.snapshot.paramMap.get('id') || '';
@@ -35,8 +51,8 @@ export class FarmDetail implements OnInit {
     this.loading = true;
     this.error = false;
 
-    this.api.getFarmById(this.farmId).subscribe({
-      next: (data: any) => {
+    this.farmService.getFarmById(this.farmId).subscribe({
+      next: (data) => {
         this.farm = data;
         this.loading = false;
         this.loadInsights();
@@ -51,15 +67,15 @@ export class FarmDetail implements OnInit {
   }
 
   loadInsights() {
-    this.api.getFarmInsights(this.farmId).subscribe({
-      next: (data: any) => (this.insights = data.dashboard_data),
+    this.farmService.getFarmInsights(this.farmId).subscribe({
+      next: (data) => (this.insights = data.dashboard_data as FarmInsights),
       error: () => {},
     });
   }
 
   loadIrrigation() {
-    this.api.checkIrrigation(this.farmId).subscribe({
-      next: (data: any) => (this.irrigation = data),
+    this.farmService.checkIrrigation(this.farmId).subscribe({
+      next: (data) => (this.irrigation = data as IrrigationStatus),
       error: () => {},
     });
   }
@@ -67,14 +83,15 @@ export class FarmDetail implements OnInit {
   syncWeather() {
     this.syncLoading = true;
     this.syncMessage = '';
-    this.api.syncWeather(this.farmId).subscribe({
+
+    this.farmService.syncWeather(this.farmId).subscribe({
       next: () => {
-        this.syncMessage = '✅ Weather synced successfully!';
+        this.syncMessage = 'Weather synced successfully.';
         this.syncLoading = false;
         this.ngOnInit();
       },
       error: (err) => {
-        this.syncMessage = '❌ ' + (err.error?.message || 'Sync failed');
+        this.syncMessage = err.error?.message || 'Sync failed.';
         this.syncLoading = false;
       },
     });
@@ -82,19 +99,19 @@ export class FarmDetail implements OnInit {
 
   addSensor() {
     if (!this.newSensor.sensor_id || !this.newSensor.type) {
-      this.sensorMessage = '⚠️ Please fill in both fields.';
+      this.sensorMessage = 'Please fill in both fields.';
       return;
     }
-    this.api.addSensor(this.farmId, this.newSensor).subscribe({
+
+    this.farmService.addSensor(this.farmId, this.newSensor).subscribe({
       next: () => {
-        this.sensorMessage = '✅ Sensor added!';
+        this.sensorMessage = 'Sensor added successfully.';
         this.showSensorForm = false;
         this.newSensor = { sensor_id: '', type: '' };
         this.ngOnInit();
       },
       error: (err) => {
-        this.sensorMessage =
-          '❌ ' + (err.error?.message || 'Failed to add sensor');
+        this.sensorMessage = err.error?.message || 'Failed to add sensor.';
       },
     });
   }

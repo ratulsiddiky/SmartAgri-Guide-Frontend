@@ -60,9 +60,9 @@
                   </p>
                 }
                 <span class="badge"
-                  [class.bg-danger]="farm.alerts_history?.length > 0"
-                  [class.bg-success]="!farm.alerts_history?.length">
-                  {{ farm.alerts_history?.length > 0 ? '⚠️ Active Alert' : '✅ All Clear' }}
+                  [class.bg-danger]="(farm.alerts_history?.length ?? 0) > 0"
+                  [class.bg-success]="(farm.alerts_history?.length ?? 0) === 0">
+                  {{ (farm.alerts_history?.length ?? 0) > 0 ? '⚠️ Active Alert' : '✅ All Clear' }}
                 </span>
               </div>
               <div class="card-footer bg-white border-top-0">

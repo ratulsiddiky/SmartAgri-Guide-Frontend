@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ApiService } from '../../../services/api.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -11,5 +11,5 @@ import { ApiService } from '../../../services/api.service';
   styleUrl: './home.css',
 })
 export class Home {
-  constructor(public api: ApiService) {}
+  constructor(public auth: AuthService) {}
 }

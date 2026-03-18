@@ -1,15 +1,55 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
-import { ApiService } from '../services/api.service';
+import {
+  CanActivateChildFn,
+  CanActivateFn,
+  CanMatchFn,
+  Router,
+} from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 export const authGuard: CanActivateFn = () => {
-  const api = inject(ApiService);
+  const authService = inject(AuthService);
   const router = inject(Router);
 
-  if (api.isLoggedIn()) {
+  if (authService.isAuthenticated()) {
     return true;
   }
 
-  router.navigate(['/login']);
-  return false;
+  return router.createUrlTree(['/login']);
+};
+
+export const authChildGuard: CanActivateChildFn = (childRoute, state) =>
+  authGuard(childRoute, state);
+
+export const authMatchGuard: CanMatchFn = () => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  if (authService.isAuthenticated()) {
+    return true;
+  }
+
+  return router.createUrlTree(['/login']);
+};
+
+export const guestGuard: CanActivateFn = () => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  if (!authService.isAuthenticated()) {
+    return true;
+  }
+
+  return router.createUrlTree(['/']);
+};
+
+export const guestMatchGuard: CanMatchFn = () => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  if (!authService.isAuthenticated()) {
+    return true;
+  }
+
+  return router.createUrlTree(['/']);
 };

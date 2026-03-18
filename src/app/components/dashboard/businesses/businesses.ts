@@ -2,7 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { ApiService } from '../../../services/api.service';
+import { Farm } from '../../../models/farm.model';
+import { FarmService } from '../../../services/farm.service';
 
 @Component({
   selector: 'app-businesses',
@@ -13,12 +14,12 @@ import { ApiService } from '../../../services/api.service';
 })
 export class Businesses {
   searchQuery = '';
-  results: any[] = [];
+  results: Farm[] = [];
   searched = false;
   loading = false;
   errorMessage = '';
 
-  constructor(private api: ApiService) {}
+  constructor(private readonly farmService: FarmService) {}
 
   onSearch() {
     if (!this.searchQuery.trim()) {
@@ -31,8 +32,8 @@ export class Businesses {
     this.errorMessage = '';
     this.results = [];
 
-    this.api.searchFarms(this.searchQuery).subscribe({
-      next: (data: any) => {
+    this.farmService.searchFarms(this.searchQuery).subscribe({
+      next: (data) => {
         this.results = data.data || [];
         this.searched = true;
         this.loading = false;

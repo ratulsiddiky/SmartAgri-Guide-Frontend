@@ -1,22 +1,110 @@
-import { Injectable } from '@angular/core';
-import { ApiService } from './api.service';
+import { Injectable, signal } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { User } from '../models/user.model';
+import { environment } from '../../environments/environment';
+
+export interface AuthResponse {
+  token: string;
+  username: string;
+  role?: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(private api: ApiService) {}
+  private readonly baseUrl = environment.apiBaseUrl;
+  private readonly currentUserSignal = signal<User | null>(this.readSession());
 
-  login(username: string, password: string) {
-    return this.api.login(username, password);
+  constructor(
+    private readonly http: HttpClient,
+    private readonly router: Router
+  ) {}
+
+  login(username: string, password: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({
+      Authorization: `Basic ${btoa(`${username}:${password}`)}`,
+    });
+
+    return this.http
+      .post<AuthResponse>(`${this.baseUrl}/login`, {}, { headers })
+      .pipe(tap((response) => this.setSession(response)));
   }
 
   logout() {
-    return this.api.logout();
+    return this.http
+      .get(`${this.baseUrl}/logout`)
+      .pipe(tap(() => this.clearSession()));
   }
 
-  isLoggedIn() {
-    return this.api.isLoggedIn();
+  isAuthenticated(): boolean {
+    return !!this.currentUserSignal()?.token;
+  }
+
+  isLoggedIn(): boolean {
+    return this.isAuthenticated();
+  }
+
+  getToken(): string {
+    return this.currentUserSignal()?.token || '';
+  }
+
+  getCurrentUser(): User | null {
+    return this.currentUserSignal();
+  }
+
+  getUsername(): string {
+    return this.currentUserSignal()?.username || '';
+  }
+
+  getRole(): string {
+    return this.currentUserSignal()?.role || '';
+  }
+
+  setSession(data: AuthResponse) {
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('username', data.username);
+
+    if (data.role) {
+      localStorage.setItem('role', data.role);
+    } else {
+      localStorage.removeItem('role');
+    }
+
+    this.currentUserSignal.set({
+      username: data.username,
+      role: data.role,
+      token: data.token,
+    });
+  }
+
+  clearSession() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('role');
+    this.currentUserSignal.set(null);
+  }
+
+  handleUnauthorized() {
+    this.clearSession();
+    void this.router.navigate(['/login']);
+  }
+
+  private readSession(): User | null {
+    const token = localStorage.getItem('token');
+    const username = localStorage.getItem('username');
+
+    if (!token || !username) {
+      return null;
+    }
+
+    return {
+      username,
+      role: localStorage.getItem('role') || undefined,
+      token,
+    };
   }
 }
-

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { ApiService } from '../../../services/api.service';
+import { FarmService } from '../../../services/farm.service';
+import { Farm } from '../../../models/farm.model';
 
 @Component({
   selector: 'app-farms-list',
@@ -11,15 +12,15 @@ import { ApiService } from '../../../services/api.service';
   styleUrl: './farms-list.css',
 })
 export class FarmsList implements OnInit {
-  farms: any[] = [];
+  farms: Farm[] = [];
   loading = true;
   error = false;
 
-  constructor(private api: ApiService) {}
+  constructor(private readonly farmService: FarmService) {}
 
   ngOnInit() {
-    this.api.getFarms().subscribe({
-      next: (data: any) => {
+    this.farmService.getFarms().subscribe({
+      next: (data) => {
         this.farms = data;
         this.loading = false;
       },
