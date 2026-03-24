@@ -53,3 +53,33 @@ export const guestMatchGuard: CanMatchFn = () => {
 
   return router.createUrlTree(['/']);
 };
+
+export const adminGuard: CanActivateFn = () => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  if (!authService.isAuthenticated()) {
+    return router.createUrlTree(['/login']);
+  }
+
+  if (authService.getRole() === 'admin') {
+    return true;
+  }
+
+  return router.createUrlTree(['/']);
+};
+
+export const adminMatchGuard: CanMatchFn = () => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  if (!authService.isAuthenticated()) {
+    return router.createUrlTree(['/login']);
+  }
+
+  if (authService.getRole() === 'admin') {
+    return true;
+  }
+
+  return router.createUrlTree(['/']);
+};

@@ -34,7 +34,7 @@ export class Businesses {
 
     this.farmService.searchFarms(this.searchQuery).subscribe({
       next: (data) => {
-        this.results = data.data || [];
+        this.results = data;
         this.searched = true;
         this.loading = false;
       },

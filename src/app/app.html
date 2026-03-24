@@ -23,6 +23,12 @@
           <a class="nav-link" routerLink="/businesses">Search Farms</a>
         </li>
 
+        @if (auth.isLoggedIn() && auth.getRole() === 'admin') {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/admin">Admin Dashboard</a>
+          </li>
+        }
+
         @if (!auth.isLoggedIn()) {
           <li class="nav-item">
             <a class="nav-link" routerLink="/login">Login</a>
@@ -45,6 +51,8 @@
     </div>
   </div>
 </nav>
+
+<app-global-alert></app-global-alert>
 
 <div class="container">
   <router-outlet></router-outlet>

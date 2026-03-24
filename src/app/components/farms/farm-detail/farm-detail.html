@@ -1,5 +1,15 @@
 <div class="container mt-4">
 
+  @if (toastMessage) {
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+      <div class="toast show text-white border-0" [class.bg-success]="toastType === 'success'" [class.bg-danger]="toastType === 'danger'" role="status" aria-live="polite">
+        <div class="d-flex">
+          <div class="toast-body">{{ toastMessage }}</div>
+        </div>
+      </div>
+    </div>
+  }
+
   @if (loading) {
     <div class="alert alert-info">⏳ Loading farm details...</div>
   }
@@ -16,7 +26,10 @@
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
       <h2 class="text-success mb-0">🚜 {{ farm.farm_name }}</h2>
-      <a routerLink="/farms" class="btn btn-outline-secondary btn-sm">← Back to All Farms</a>
+      <div class="d-flex gap-2">
+        <a [routerLink]="['/farms', farm._id, 'edit']" class="btn btn-outline-primary btn-sm">Edit Farm</a>
+        <a routerLink="/farms" class="btn btn-outline-secondary btn-sm">← Back to All Farms</a>
+      </div>
     </div>
 
     <div class="row g-4">
@@ -113,13 +126,18 @@
 
       <!-- Irrigation -->
       <div class="col-md-6">
-        <div class="card shadow-sm border-primary h-100">
+        <div class="card shadow-sm border-primary h-100" [appHighlightStatus]="irrigation?.status || 'OK'">
           <div class="card-header bg-primary text-white">💧 Irrigation Status</div>
           <div class="card-body">
+            <div *ngIf="irrigation?.status === 'WARNING'" class="alert alert-warning" role="alert">
+              ⚠️ Irrigation Warning: Soil moisture is below safe threshold.
+            </div>
+
             @if (irrigation) {
               <p class="mb-2">
                 <strong>Status:</strong>
                 <span class="badge ms-2"
+                  [appHighlightStatus]="irrigation.status"
                   [class.bg-danger]="irrigation.status === 'WARNING'"
                   [class.bg-success]="irrigation.status === 'OK'">
                   {{ irrigation.status }}
@@ -193,7 +211,9 @@
                         @if (sensor.readings && sensor.readings.length > 0) {
                           <p class="mb-0 mt-1 small">
                             Last reading:
-                            <strong>{{ sensor.readings[sensor.readings.length - 1].value }}</strong>
+                            <strong [appHighlightStatus]="sensor.readings[sensor.readings.length - 1].value">
+                              {{ sensor.readings[sensor.readings.length - 1].value }}
+                            </strong>
                           </p>
                         }
                       </div>

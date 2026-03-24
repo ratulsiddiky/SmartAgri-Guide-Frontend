@@ -8,6 +8,7 @@
         </div>
 
         <div class="card-body p-4">
+          <form [formGroup]="loginForm" (ngSubmit)="onLogin()" novalidate>
 
           @if (errorMessage) {
             <div class="alert alert-danger py-2" role="alert">
@@ -22,9 +23,12 @@
               type="text"
               class="form-control"
               placeholder="Enter username"
-              [(ngModel)]="username"
+              formControlName="username"
               [disabled]="loading"
             />
+            @if (loginForm.controls.username.touched && loginForm.controls.username.invalid) {
+              <div class="text-danger small mt-1">Username is required.</div>
+            }
           </div>
 
           <div class="mb-4">
@@ -34,15 +38,18 @@
               type="password"
               class="form-control"
               placeholder="Enter password"
-              [(ngModel)]="password"
+              formControlName="password"
               [disabled]="loading"
               (keyup.enter)="onLogin()"
             />
+            @if (loginForm.controls.password.touched && loginForm.controls.password.invalid) {
+              <div class="text-danger small mt-1">Password is required.</div>
+            }
           </div>
 
           <button
+            type="submit"
             class="btn btn-success w-100"
-            (click)="onLogin()"
             [disabled]="loading"
           >
             @if (loading) {
@@ -52,6 +59,7 @@
               Login
             }
           </button>
+          </form>
 
         </div>
 

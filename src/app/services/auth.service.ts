@@ -12,6 +12,17 @@ export interface AuthResponse {
   role?: string;
 }
 
+export interface RegisterRequest {
+  username: string;
+  email: string;
+  password: string;
+}
+
+export interface RegisterResponse {
+  message: string;
+  verification_link?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -32,6 +43,14 @@ export class AuthService {
     return this.http
       .post<AuthResponse>(`${this.baseUrl}/login`, {}, { headers })
       .pipe(tap((response) => this.setSession(response)));
+  }
+
+  register(payload: RegisterRequest): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${this.baseUrl}/users/register`, {
+      ...payload,
+      role: 'user',
+      contact_preference: 'email',
+    });
   }
 
   logout() {

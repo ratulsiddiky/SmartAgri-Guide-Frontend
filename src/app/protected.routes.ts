@@ -1,5 +1,10 @@
 import { Routes } from '@angular/router';
-import { authChildGuard, authMatchGuard } from './guards/auth.guard';
+import {
+  adminGuard,
+  adminMatchGuard,
+  authChildGuard,
+  authMatchGuard,
+} from './guards/auth.guard';
 
 export const protectedRoutes: Routes = [
   {
@@ -20,6 +25,20 @@ export const protectedRoutes: Routes = [
           ),
       },
       {
+        path: 'farms/new',
+        loadComponent: () =>
+          import('./components/farms/farm-form/farm-form').then(
+            (m) => m.FarmForm
+          ),
+      },
+      {
+        path: 'farms/:id/edit',
+        loadComponent: () =>
+          import('./components/farms/farm-form/farm-form').then(
+            (m) => m.FarmForm
+          ),
+      },
+      {
         path: 'farms/:id',
         loadComponent: () =>
           import('./components/farms/farm-detail/farm-detail').then(
@@ -31,6 +50,15 @@ export const protectedRoutes: Routes = [
         loadComponent: () =>
           import('./components/dashboard/businesses/businesses').then(
             (m) => m.Businesses
+          ),
+      },
+      {
+        path: 'admin',
+        canMatch: [adminMatchGuard],
+        canActivate: [adminGuard],
+        loadComponent: () =>
+          import('./components/dashboard/admin-dashboard/admin-dashboard').then(
+            (m) => m.AdminDashboard
           ),
       },
     ],

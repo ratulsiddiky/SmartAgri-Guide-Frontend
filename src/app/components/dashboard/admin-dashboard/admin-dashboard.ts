@@ -1,0 +1,148 @@
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { FarmService } from '../../../services/farm.service';
+import { BroadcastAlertRequest } from '../../../services/api.service';
+
+@Component({
+  selector: 'app-admin-dashboard',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './admin-dashboard.html',
+  styleUrl: './admin-dashboard.css',
+})
+export class AdminDashboard {
+  readonly broadcastForm = new FormGroup({
+    alert_type: new FormControl('Flood', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    danger_zone: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+  });
+
+  readonly insightsForm = new FormGroup({
+    region_name: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+  });
+
+  alertLoading = false;
+  insightsLoading = false;
+  alertMessage = '';
+  alertError = '';
+  insightsError = '';
+  farmsNotified = 0;
+  insightsData: { community_avg_temp: number; total_farms_included: number } | null =
+    null;
+
+  constructor(private readonly farmService: FarmService) {}
+
+  /**
+   * Broadcasts an admin alert to farms within the provided GeoJSON polygon.
+   */
+  onBroadcast(): void {
+    if (this.broadcastForm.invalid) {
+      this.broadcastForm.markAllAsTouched();
+      return;
+    }
+
+    this.alertLoading = true;
+    this.alertMessage = '';
+    this.alertError = '';
+
+    const rawZone = this.broadcastForm.controls.danger_zone.value.trim();
+    const parsedZone = this.parseDangerZone(rawZone);
+
+    if (!parsedZone) {
+      this.alertLoading = false;
+      this.alertError =
+        'danger_zone must be valid GeoJSON Polygon JSON with coordinates.';
+      return;
+    }
+
+    const payload: BroadcastAlertRequest = {
+      alert_type: this.broadcastForm.controls.alert_type.value,
+      danger_zone: parsedZone,
+    };
+
+    this.farmService.broadcastAlert(payload).subscribe({
+      next: (response) => {
+        this.alertLoading = false;
+        this.farmsNotified = response.farms_notified;
+        this.alertMessage = response.message || 'Alert broadcast successful.';
+      },
+      error: (err) => {
+        this.alertLoading = false;
+        this.alertError =
+          err.error?.message || 'Alert broadcast failed. Please review payload.';
+      },
+    });
+  }
+
+  /**
+   * Loads regional insight metrics for the selected area name.
+   */
+  loadRegionalInsights(): void {
+    if (this.insightsForm.invalid) {
+      this.insightsForm.markAllAsTouched();
+      return;
+    }
+
+    this.insightsLoading = true;
+    this.insightsError = '';
+    this.insightsData = null;
+
+    const regionName = this.insightsForm.controls.region_name.value.trim();
+
+    this.farmService.getRegionalInsights(regionName).subscribe({
+      next: (response) => {
+        this.insightsLoading = false;
+        this.insightsData = response.data;
+      },
+      error: (err) => {
+        this.insightsLoading = false;
+        this.insightsError =
+          err.error?.message ||
+          'Regional insights unavailable for this region.';
+      },
+    });
+  }
+
+  /**
+   * Validates and parses a GeoJSON polygon payload.
+   */
+  private parseDangerZone(
+    rawJson: string
+  ): { type: 'Polygon'; coordinates: number[][][] } | null {
+    try {
+      const parsed = JSON.parse(rawJson) as {
+        type?: string;
+        coordinates?: unknown;
+      };
+
+      if (
+        parsed.type !== 'Polygon' ||
+        !Array.isArray(parsed.coordinates) ||
+        parsed.coordinates.length === 0
+      ) {
+        return null;
+      }
+
+      return {
+        type: 'Polygon',
+        coordinates: parsed.coordinates as number[][][],
+      };
+    } catch {
+      return null;
+    }
+  }
+}

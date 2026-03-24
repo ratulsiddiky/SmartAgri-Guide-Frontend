@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Farm, FarmSensor } from '../../../models/farm.model';
 import { FarmService } from '../../../services/farm.service';
+import { HighlightStatusDirective } from '../../../directives/highlight-status.directive';
 
 interface FarmInsights {
   average_temp?: number;
@@ -20,7 +21,7 @@ interface IrrigationStatus {
 @Component({
   selector: 'app-farm-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, HighlightStatusDirective],
   templateUrl: './farm-detail.html',
   styleUrl: './farm-detail.css',
 })
@@ -33,6 +34,8 @@ export class FarmDetail implements OnInit {
 
   syncLoading = false;
   syncMessage = '';
+  toastMessage = '';
+  toastType: 'success' | 'danger' = 'success';
 
   showSensorForm = false;
   newSensor: FarmSensor = { sensor_id: '', type: '' };
@@ -47,6 +50,9 @@ export class FarmDetail implements OnInit {
     return this.route.snapshot.paramMap.get('id') || '';
   }
 
+  /**
+   * Initializes farm detail state and loads intelligence widgets.
+   */
   ngOnInit() {
     this.loading = true;
     this.error = false;
@@ -66,6 +72,9 @@ export class FarmDetail implements OnInit {
     });
   }
 
+  /**
+   * Loads weather insight dashboard values for this farm.
+   */
   loadInsights() {
     this.farmService.getFarmInsights(this.farmId).subscribe({
       next: (data) => (this.insights = data.dashboard_data as FarmInsights),
@@ -73,6 +82,9 @@ export class FarmDetail implements OnInit {
     });
   }
 
+  /**
+   * Loads irrigation status from the smart irrigation endpoint.
+   */
   loadIrrigation() {
     this.farmService.checkIrrigation(this.farmId).subscribe({
       next: (data) => (this.irrigation = data as IrrigationStatus),
@@ -80,23 +92,31 @@ export class FarmDetail implements OnInit {
     });
   }
 
+  /**
+   * Triggers weather synchronization and refreshes intelligence cards.
+   */
   syncWeather() {
     this.syncLoading = true;
     this.syncMessage = '';
 
     this.farmService.syncWeather(this.farmId).subscribe({
       next: () => {
-        this.syncMessage = 'Weather synced successfully.';
+        this.syncMessage = '✅ Weather synced successfully.';
+        this.showToast('Weather synced successfully.', 'success');
         this.syncLoading = false;
         this.ngOnInit();
       },
       error: (err) => {
-        this.syncMessage = err.error?.message || 'Sync failed.';
+        this.syncMessage = `❌ ${err.error?.message || 'Sync failed.'}`;
+        this.showToast(err.error?.message || 'Sync failed.', 'danger');
         this.syncLoading = false;
       },
     });
   }
 
+  /**
+   * Adds a new sensor and refreshes farm intelligence data.
+   */
   addSensor() {
     if (!this.newSensor.sensor_id || !this.newSensor.type) {
       this.sensorMessage = 'Please fill in both fields.';
@@ -114,5 +134,17 @@ export class FarmDetail implements OnInit {
         this.sensorMessage = err.error?.message || 'Failed to add sensor.';
       },
     });
+  }
+
+  /**
+   * Displays temporary toast feedback for key user actions.
+   */
+  showToast(message: string, type: 'success' | 'danger'): void {
+    this.toastMessage = message;
+    this.toastType = type;
+
+    window.setTimeout(() => {
+      this.toastMessage = '';
+    }, 2500);
   }
 }

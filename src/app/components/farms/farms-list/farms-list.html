@@ -1,5 +1,50 @@
 <div class="container mt-4">
-  <h2 class="mb-4 text-success">🚜 Registered Farms</h2>
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h2 class="text-success mb-0">🚜 Registered Farms</h2>
+    <a routerLink="/farms/new" class="btn btn-success btn-sm">+ Add New Farm</a>
+  </div>
+
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-5">
+          <label for="search" class="form-label fw-semibold">Search Farms</label>
+          <input
+            id="search"
+            type="text"
+            class="form-control"
+            placeholder="Search by name, crop, location..."
+            [(ngModel)]="query"
+            [disabled]="loading"
+            (keyup.enter)="onSearch()"
+          />
+        </div>
+        <div class="col-md-3">
+          <label for="sortBy" class="form-label fw-semibold">Sort By</label>
+          <select
+            id="sortBy"
+            class="form-select"
+            [(ngModel)]="sortBy"
+            (change)="onSortChange()"
+            [disabled]="loading"
+          >
+            <option value="name-asc">Name (A-Z)</option>
+            <option value="name-desc">Name (Z-A)</option>
+            <option value="crop-asc">Crop Type (A-Z)</option>
+            <option value="sensors-desc">Most Sensors</option>
+          </select>
+        </div>
+        <div class="col-md-4 d-flex gap-2">
+          <button type="button" class="btn btn-success" (click)="onSearch()" [disabled]="loading">
+            Search
+          </button>
+          <button type="button" class="btn btn-outline-secondary" (click)="clearSearch()" [disabled]="loading">
+            Clear
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   @if (loading) {
     <div class="alert alert-info shadow-sm">⏳ Loading farm data...</div>
@@ -7,7 +52,7 @@
 
   @if (error) {
     <div class="alert alert-danger shadow-sm">
-      ❌ Could not connect to the server. Please make sure the backend is running on port 5001.
+      ❌ {{ errorMessage }}
     </div>
   }
 
@@ -43,10 +88,29 @@
           </div>
 
           <div class="card-footer bg-white border-top-0">
-            <a class="btn btn-outline-success w-100"
-              [routerLink]="['/farms', farm._id]">
-              View Full Dashboard →
-            </a>
+            <div class="d-grid gap-2">
+              <a class="btn btn-outline-success"
+                [routerLink]="['/farms', farm._id]">
+                View Full Dashboard →
+              </a>
+              <a class="btn btn-outline-primary btn-sm"
+                [routerLink]="['/farms', farm._id, 'edit']">
+                Edit Farm
+              </a>
+              <button
+                type="button"
+                class="btn btn-outline-danger btn-sm"
+                (click)="deleteFarm(farm)"
+                [disabled]="deletingFarmId === farm._id"
+              >
+                @if (deletingFarmId === farm._id) {
+                  <span class="spinner-border spinner-border-sm me-1"></span>
+                  Deleting...
+                } @else {
+                  Delete
+                }
+              </button>
+            </div>
           </div>
 
         </div>
@@ -55,10 +119,40 @@
       @if (!loading && !error) {
         <div class="col-12">
           <div class="alert alert-warning shadow-sm">
-            No farms registered yet.
+            @if (query.trim()) {
+              No farms found for "{{ query }}".
+            } @else {
+              No farms registered yet.
+            }
           </div>
         </div>
       }
     }
   </div>
+
+  @if (!loading && !query.trim()) {
+    <div class="d-flex justify-content-between align-items-center mt-4">
+      <div class="text-muted small">
+        Page {{ page }} | Total farms: {{ totalFarms }}
+      </div>
+      <div class="btn-group">
+        <button
+          type="button"
+          class="btn btn-outline-success"
+          (click)="previousPage()"
+          [disabled]="page <= 1 || loading"
+        >
+          ← Previous
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-success"
+          (click)="nextPage()"
+          [disabled]="!hasNext || loading"
+        >
+          Next →
+        </button>
+      </div>
+    </div>
+  }
 </div>
