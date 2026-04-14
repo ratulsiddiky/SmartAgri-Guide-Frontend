@@ -4,11 +4,23 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { NotificationService } from '../../../services/notification.service';
+import { TrimInputDirective } from '../../../directives/trim-input.directive';
+import { FormErrorDirective } from '../../../directives/form-error.directive';
+import { DisableWhileLoadingDirective } from '../../../directives/disable-while-loading.directive';
+import { LoadingSpinnerDirective } from '../../../directives/loading-spinner.directive';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    TrimInputDirective,
+    FormErrorDirective,
+    DisableWhileLoadingDirective,
+    LoadingSpinnerDirective,
+  ],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })

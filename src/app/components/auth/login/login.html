@@ -7,7 +7,7 @@
           <h3 class="mb-0">🌱 SmartAgri Login</h3>
         </div>
 
-        <div class="card-body p-4">
+        <div class="card-body p-4" [appLoadingSpinner]="loading">
           <form [formGroup]="loginForm" (ngSubmit)="onLogin()" novalidate>
 
           @if (errorMessage) {
@@ -24,11 +24,14 @@
               class="form-control"
               placeholder="Enter username"
               formControlName="username"
-              [disabled]="loading"
+              appTrimInput
+              [appDisableWhileLoading]="loading"
+              aria-label="Username"
             />
-            @if (loginForm.controls.username.touched && loginForm.controls.username.invalid) {
-              <div class="text-danger small mt-1">Username is required.</div>
-            }
+            <div
+              [appFormError]="loginForm.controls.username"
+              [appFormErrorMessages]="{ required: 'Username is required.' }"
+            ></div>
           </div>
 
           <div class="mb-4">
@@ -39,18 +42,22 @@
               class="form-control"
               placeholder="Enter password"
               formControlName="password"
-              [disabled]="loading"
+              appTrimInput
+              [appDisableWhileLoading]="loading"
               (keyup.enter)="onLogin()"
+              aria-label="Password"
             />
-            @if (loginForm.controls.password.touched && loginForm.controls.password.invalid) {
-              <div class="text-danger small mt-1">Password is required.</div>
-            }
+            <div
+              [appFormError]="loginForm.controls.password"
+              [appFormErrorMessages]="{ required: 'Password is required.' }"
+            ></div>
           </div>
 
           <button
             type="submit"
             class="btn btn-success w-100"
-            [disabled]="loading"
+            [appDisableWhileLoading]="loading"
+            aria-label="Submit login"
           >
             @if (loading) {
               <span class="spinner-border spinner-border-sm me-2"></span>

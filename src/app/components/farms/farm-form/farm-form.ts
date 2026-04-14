@@ -4,11 +4,23 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 import { NotificationService } from '../../../services/notification.service';
+import { TrimInputDirective } from '../../../directives/trim-input.directive';
+import { FormErrorDirective } from '../../../directives/form-error.directive';
+import { DisableWhileLoadingDirective } from '../../../directives/disable-while-loading.directive';
+import { LoadingSpinnerDirective } from '../../../directives/loading-spinner.directive';
 
 @Component({
   selector: 'app-farm-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    TrimInputDirective,
+    FormErrorDirective,
+    DisableWhileLoadingDirective,
+    LoadingSpinnerDirective,
+  ],
   templateUrl: './farm-form.html',
   styleUrl: './farm-form.css',
 })
@@ -16,15 +28,15 @@ export class FarmForm implements OnInit {
   readonly farmForm = new FormGroup({
     farm_name: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.minLength(3), Validators.maxLength(64)],
     }),
     crop_type: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.minLength(2), Validators.maxLength(40)],
     }),
     area_name: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.minLength(2), Validators.maxLength(80)],
     }),
   });
 

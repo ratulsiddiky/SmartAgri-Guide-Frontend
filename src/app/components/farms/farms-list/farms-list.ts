@@ -4,11 +4,21 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { FarmService } from '../../../services/farm.service';
 import { Farm } from '../../../models/farm.model';
+import { TrimInputDirective } from '../../../directives/trim-input.directive';
+import { DisableWhileLoadingDirective } from '../../../directives/disable-while-loading.directive';
+import { LoadingSpinnerDirective } from '../../../directives/loading-spinner.directive';
 
 @Component({
   selector: 'app-farms-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    TrimInputDirective,
+    DisableWhileLoadingDirective,
+    LoadingSpinnerDirective,
+  ],
   templateUrl: './farms-list.html',
   styleUrl: './farms-list.css',
 })

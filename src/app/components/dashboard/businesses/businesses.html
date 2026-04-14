@@ -3,20 +3,24 @@
   <p class="text-muted mb-4">Search for farms by name or area.</p>
 
   <!-- Search bar -->
-  <div class="row g-2 mb-4">
+  <div class="row g-2 mb-4" [appLoadingSpinner]="loading">
     <div class="col-md-8">
       <input
         type="text"
         class="form-control form-control-lg"
-        placeholder="Search by farm name or area (e.g. Yorkshire, Wheat Farm)..."
+        placeholder="Type farm name or area (e.g. Yorkshire, Wheat Farm)..."
         [(ngModel)]="searchQuery"
+        appTrimInput
+        [appDisableWhileLoading]="loading"
         (keyup.enter)="onSearch()"
+        aria-label="Search farms by name or area"
       />
     </div>
     <div class="col-md-2">
       <button class="btn btn-success btn-lg w-100"
         (click)="onSearch()"
-        [disabled]="loading">
+        [appDisableWhileLoading]="loading"
+        aria-label="Run farm search">
         @if (loading) {
           <span class="spinner-border spinner-border-sm"></span>
         } @else {
@@ -26,7 +30,9 @@
     </div>
     <div class="col-md-2">
       <button class="btn btn-outline-secondary btn-lg w-100"
-        (click)="clearSearch()">
+        (click)="clearSearch()"
+        [appDisableWhileLoading]="loading"
+        aria-label="Clear farm search">
         Clear
       </button>
     </div>

@@ -20,7 +20,7 @@
 
   @if (!loading) {
     <div class="card shadow-sm border-success">
-      <div class="card-body p-4">
+      <div class="card-body p-4" [appLoadingSpinner]="submitting || loading">
         <form [formGroup]="farmForm" (ngSubmit)="onSubmit()" novalidate>
           <div class="mb-3">
             <label for="farm_name" class="form-label fw-semibold">Farm Name</label>
@@ -30,11 +30,18 @@
               class="form-control"
               formControlName="farm_name"
               placeholder="e.g. Green Valley Farm"
-              [disabled]="submitting"
+              appTrimInput
+              [appDisableWhileLoading]="submitting"
+              aria-label="Farm name"
             />
-            @if (farmForm.controls.farm_name.touched && farmForm.controls.farm_name.invalid) {
-              <div class="text-danger small mt-1">Farm name is required.</div>
-            }
+            <div
+              [appFormError]="farmForm.controls.farm_name"
+              [appFormErrorMessages]="{
+                required: 'Farm name is required.',
+                minlength: 'Farm name must be at least 3 characters.',
+                maxlength: 'Farm name must be 64 characters or less.'
+              }"
+            ></div>
           </div>
 
           <div class="mb-3">
@@ -45,11 +52,18 @@
               class="form-control"
               formControlName="crop_type"
               placeholder="e.g. Wheat"
-              [disabled]="submitting"
+              appTrimInput
+              [appDisableWhileLoading]="submitting"
+              aria-label="Crop type"
             />
-            @if (farmForm.controls.crop_type.touched && farmForm.controls.crop_type.invalid) {
-              <div class="text-danger small mt-1">Crop type is required.</div>
-            }
+            <div
+              [appFormError]="farmForm.controls.crop_type"
+              [appFormErrorMessages]="{
+                required: 'Crop type is required.',
+                minlength: 'Crop type must be at least 2 characters.',
+                maxlength: 'Crop type must be 40 characters or less.'
+              }"
+            ></div>
           </div>
 
           <div class="mb-4">
@@ -60,18 +74,25 @@
               class="form-control"
               formControlName="area_name"
               placeholder="e.g. County Antrim"
-              [disabled]="submitting"
+              appTrimInput
+              [appDisableWhileLoading]="submitting"
+              aria-label="Area name"
             />
-            @if (farmForm.controls.area_name.touched && farmForm.controls.area_name.invalid) {
-              <div class="text-danger small mt-1">Area name is required.</div>
-            }
+            <div
+              [appFormError]="farmForm.controls.area_name"
+              [appFormErrorMessages]="{
+                required: 'Area name is required.',
+                minlength: 'Area name must be at least 2 characters.',
+                maxlength: 'Area name must be 80 characters or less.'
+              }"
+            ></div>
           </div>
 
           @if (successMessage) {
             <div class="alert alert-success py-2" role="status">{{ successMessage }}</div>
           }
 
-          <button type="submit" class="btn btn-success" [disabled]="submitting">
+          <button type="submit" class="btn btn-success" [appDisableWhileLoading]="submitting" aria-label="Save farm">
             @if (submitting) {
               <span class="spinner-border spinner-border-sm me-1"></span>
               Saving...

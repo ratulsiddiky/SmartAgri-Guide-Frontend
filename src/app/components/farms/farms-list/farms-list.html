@@ -4,7 +4,7 @@
     <a routerLink="/farms/new" class="btn btn-success btn-sm">+ Add New Farm</a>
   </div>
 
-  <div class="card shadow-sm border-0 mb-4">
+  <div class="card shadow-sm border-0 mb-4" [appLoadingSpinner]="loading">
     <div class="card-body">
       <div class="row g-2 align-items-end">
         <div class="col-md-5">
@@ -13,10 +13,12 @@
             id="search"
             type="text"
             class="form-control"
-            placeholder="Search by name, crop, location..."
+            placeholder="Search by farm name, crop type, or location..."
             [(ngModel)]="query"
-            [disabled]="loading"
+            appTrimInput
+            [appDisableWhileLoading]="loading"
             (keyup.enter)="onSearch()"
+            aria-label="Search farms"
           />
         </div>
         <div class="col-md-3">
@@ -26,7 +28,8 @@
             class="form-select"
             [(ngModel)]="sortBy"
             (change)="onSortChange()"
-            [disabled]="loading"
+            [appDisableWhileLoading]="loading"
+            aria-label="Sort farms"
           >
             <option value="name-asc">Name (A-Z)</option>
             <option value="name-desc">Name (Z-A)</option>
@@ -35,10 +38,10 @@
           </select>
         </div>
         <div class="col-md-4 d-flex gap-2">
-          <button type="button" class="btn btn-success" (click)="onSearch()" [disabled]="loading">
+          <button type="button" class="btn btn-success" (click)="onSearch()" [appDisableWhileLoading]="loading" aria-label="Search farms">
             Search
           </button>
-          <button type="button" class="btn btn-outline-secondary" (click)="clearSearch()" [disabled]="loading">
+          <button type="button" class="btn btn-outline-secondary" (click)="clearSearch()" [appDisableWhileLoading]="loading" aria-label="Clear farm search">
             Clear
           </button>
         </div>
@@ -102,6 +105,7 @@
                 class="btn btn-outline-danger btn-sm"
                 (click)="deleteFarm(farm)"
                 [disabled]="deletingFarmId === farm._id"
+                aria-label="Delete farm"
               >
                 @if (deletingFarmId === farm._id) {
                   <span class="spinner-border spinner-border-sm me-1"></span>
@@ -141,6 +145,7 @@
           class="btn btn-outline-success"
           (click)="previousPage()"
           [disabled]="page <= 1 || loading"
+          aria-label="Previous farm page"
         >
           ← Previous
         </button>
@@ -149,6 +154,7 @@
           class="btn btn-outline-success"
           (click)="nextPage()"
           [disabled]="!hasNext || loading"
+          aria-label="Next farm page"
         >
           Next →
         </button>

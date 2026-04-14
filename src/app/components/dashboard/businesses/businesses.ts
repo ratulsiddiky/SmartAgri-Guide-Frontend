@@ -4,11 +4,21 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Farm } from '../../../models/farm.model';
 import { FarmService } from '../../../services/farm.service';
+import { TrimInputDirective } from '../../../directives/trim-input.directive';
+import { DisableWhileLoadingDirective } from '../../../directives/disable-while-loading.directive';
+import { LoadingSpinnerDirective } from '../../../directives/loading-spinner.directive';
 
 @Component({
   selector: 'app-businesses',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    TrimInputDirective,
+    DisableWhileLoadingDirective,
+    LoadingSpinnerDirective,
+  ],
   templateUrl: './businesses.html',
   styleUrl: './businesses.css',
 })
@@ -22,7 +32,8 @@ export class Businesses {
   constructor(private readonly farmService: FarmService) {}
 
   onSearch() {
-    if (!this.searchQuery.trim()) {
+    const query = this.searchQuery.trim();
+    if (!query) {
       this.errorMessage = 'Please enter a search term.';
       return;
     }
@@ -32,7 +43,7 @@ export class Businesses {
     this.errorMessage = '';
     this.results = [];
 
-    this.farmService.searchFarms(this.searchQuery).subscribe({
+    this.farmService.searchFarms(query).subscribe({
       next: (data) => {
         this.results = data;
         this.searched = true;
