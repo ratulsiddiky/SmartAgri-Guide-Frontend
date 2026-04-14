@@ -11,6 +11,10 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { TrimInputDirective } from '../../../directives/trim-input.directive';
+import { FormErrorDirective } from '../../../directives/form-error.directive';
+import { DisableWhileLoadingDirective } from '../../../directives/disable-while-loading.directive';
+import { LoadingSpinnerDirective } from '../../../directives/loading-spinner.directive';
 
 const passwordMatchValidator: ValidatorFn = (
   control: AbstractControl
@@ -25,10 +29,30 @@ const passwordMatchValidator: ValidatorFn = (
   return password === confirmPassword ? null : { passwordMismatch: true };
 };
 
+/**
+ * Enforces at least 8 chars including lowercase, uppercase, digit and symbol.
+ */
+const strongPasswordPattern =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
+
+const getPasswordRuleMatches = (value: string) => ({
+  hasMinLength: value.length >= 8,
+  hasUpperAndLower: /[A-Z]/.test(value) && /[a-z]/.test(value),
+  hasDigitAndSymbol: /\d/.test(value) && /[^A-Za-z\d]/.test(value),
+});
+
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    TrimInputDirective,
+    FormErrorDirective,
+    DisableWhileLoadingDirective,
+    LoadingSpinnerDirective,
+  ],
   templateUrl: './register.html',
   styleUrl: './register.css',
 })
@@ -45,7 +69,11 @@ export class Register {
       }),
       password: new FormControl('', {
         nonNullable: true,
-        validators: [Validators.required, Validators.minLength(8)],
+        validators: [
+          Validators.required,
+          Validators.minLength(8),
+          Validators.pattern(strongPasswordPattern),
+        ],
       }),
       confirmPassword: new FormControl('', {
         nonNullable: true,
@@ -56,6 +84,8 @@ export class Register {
   );
 
   loading = false;
+  showPassword = false;
+  showConfirmPassword = false;
   errorMessage = '';
   successMessage = '';
   verificationLink = '';
@@ -102,5 +132,31 @@ export class Register {
   goToLogin(): void {
     void this.router.navigate(['/login']);
   }
-}
 
+  get passwordStrength(): 'weak' | 'medium' | 'strong' {
+    const value = this.registerForm.controls.password.value;
+    if (!value) {
+      return 'weak';
+    }
+
+    const passwordChecks = getPasswordRuleMatches(value);
+    let score = 0;
+    if (passwordChecks.hasMinLength) {
+      score += 1;
+    }
+    if (passwordChecks.hasUpperAndLower) {
+      score += 1;
+    }
+    if (passwordChecks.hasDigitAndSymbol) {
+      score += 1;
+    }
+
+    if (score <= 1) {
+      return 'weak';
+    }
+    if (score === 2) {
+      return 'medium';
+    }
+    return 'strong';
+  }
+}
