@@ -29,6 +29,18 @@ const passwordMatchValidator: ValidatorFn = (
   return password === confirmPassword ? null : { passwordMismatch: true };
 };
 
+/**
+ * Enforces at least 8 chars including lowercase, uppercase, digit and symbol.
+ */
+const strongPasswordPattern =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
+
+const getPasswordRuleMatches = (value: string) => ({
+  hasMinLength: value.length >= 8,
+  hasUpperAndLower: /[A-Z]/.test(value) && /[a-z]/.test(value),
+  hasDigitAndSymbol: /\d/.test(value) && /[^A-Za-z\d]/.test(value),
+});
+
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -60,7 +72,7 @@ export class Register {
         validators: [
           Validators.required,
           Validators.minLength(8),
-          Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/),
+          Validators.pattern(strongPasswordPattern),
         ],
       }),
       confirmPassword: new FormControl('', {
@@ -127,14 +139,15 @@ export class Register {
       return 'weak';
     }
 
+    const passwordChecks = getPasswordRuleMatches(value);
     let score = 0;
-    if (value.length >= 8) {
+    if (passwordChecks.hasMinLength) {
       score += 1;
     }
-    if (/[A-Z]/.test(value) && /[a-z]/.test(value)) {
+    if (passwordChecks.hasUpperAndLower) {
       score += 1;
     }
-    if (/\d/.test(value) && /[^A-Za-z\d]/.test(value)) {
+    if (passwordChecks.hasDigitAndSymbol) {
       score += 1;
     }
 

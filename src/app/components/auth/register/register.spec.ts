@@ -51,6 +51,14 @@ describe('Register', () => {
     expect(component.passwordStrength).toBe('weak');
   });
 
+  it('calculates password strength levels', () => {
+    component.registerForm.controls.password.setValue('Password123');
+    expect(component.passwordStrength).toBe('medium');
+
+    component.registerForm.controls.password.setValue('Password1!');
+    expect(component.passwordStrength).toBe('strong');
+  });
+
   it('submits valid registration payload', () => {
     component.registerForm.setValue({
       username: 'ratul',

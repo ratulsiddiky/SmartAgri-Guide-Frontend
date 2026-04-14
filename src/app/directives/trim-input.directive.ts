@@ -20,6 +20,5 @@ export class TrimInputDirective {
 
     input.value = trimmedValue;
     input.dispatchEvent(new Event('input', { bubbles: true }));
-    input.dispatchEvent(new Event('change', { bubbles: true }));
   }
 }

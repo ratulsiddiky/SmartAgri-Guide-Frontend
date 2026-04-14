@@ -4,26 +4,59 @@ import {
 } from '@angular/forms';
 import {
   Directive,
-  DoCheck,
   ElementRef,
   Input,
+  OnChanges,
+  OnDestroy,
   Renderer2,
+  SimpleChanges,
 } from '@angular/core';
+import { merge, Subscription } from 'rxjs';
 
 @Directive({
   selector: '[appFormError]',
   standalone: true,
 })
-export class FormErrorDirective implements DoCheck {
+export class FormErrorDirective implements OnChanges, OnDestroy {
   @Input('appFormError') control: AbstractControl | null = null;
   @Input() appFormErrorMessages: Record<string, string> = {};
+  private controlStateSub: Subscription | null = null;
 
   constructor(
     private readonly elementRef: ElementRef<HTMLElement>,
     private readonly renderer: Renderer2
   ) {}
 
-  ngDoCheck(): void {
+  ngOnChanges(changes: SimpleChanges): void {
+    if ('control' in changes) {
+      this.subscribeToControlChanges();
+    }
+    this.renderErrorState();
+  }
+
+  ngOnDestroy(): void {
+    this.controlStateSub?.unsubscribe();
+    this.controlStateSub = null;
+  }
+
+  private subscribeToControlChanges(): void {
+    this.controlStateSub?.unsubscribe();
+    this.controlStateSub = null;
+
+    if (!this.control) {
+      return;
+    }
+
+    this.controlStateSub = merge(
+      this.control.statusChanges,
+      this.control.valueChanges,
+      this.control.events
+    ).subscribe(() => {
+      this.renderErrorState();
+    });
+  }
+
+  private renderErrorState(): void {
     const host = this.elementRef.nativeElement;
     const shouldShow = !!(
       this.control &&
@@ -35,7 +68,6 @@ export class FormErrorDirective implements DoCheck {
     if (!shouldShow) {
       this.renderer.setStyle(host, 'display', 'none');
       this.renderer.setProperty(host, 'textContent', '');
-      this.renderer.setProperty(host, 'innerText', '');
       this.renderer.removeAttribute(host, 'title');
       return;
     }
@@ -46,7 +78,6 @@ export class FormErrorDirective implements DoCheck {
     this.renderer.addClass(host, 'small');
     this.renderer.addClass(host, 'mt-1');
     this.renderer.setProperty(host, 'textContent', message);
-    this.renderer.setProperty(host, 'innerText', message);
     this.renderer.setAttribute(host, 'title', message);
   }
 
@@ -72,17 +103,17 @@ export class FormErrorDirective implements DoCheck {
       return 'Please enter a valid email address.';
     }
     if (firstErrorKey === 'minlength') {
-      const requiredLength = (errors['minlength'] as { requiredLength?: number })
+      const minRequiredLength = (errors['minlength'] as { requiredLength?: number })
         ?.requiredLength;
-      return requiredLength
-        ? `Please enter at least ${requiredLength} characters.`
+      return minRequiredLength
+        ? `Please enter at least ${minRequiredLength} characters.`
         : 'Input is too short.';
     }
     if (firstErrorKey === 'maxlength') {
-      const requiredLength = (errors['maxlength'] as { requiredLength?: number })
+      const maxAllowedLength = (errors['maxlength'] as { requiredLength?: number })
         ?.requiredLength;
-      return requiredLength
-        ? `Please use no more than ${requiredLength} characters.`
+      return maxAllowedLength
+        ? `Please use no more than ${maxAllowedLength} characters.`
         : 'Input is too long.';
     }
     if (firstErrorKey === 'pattern') {
