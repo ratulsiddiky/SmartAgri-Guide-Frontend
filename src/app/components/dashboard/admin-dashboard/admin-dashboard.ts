@@ -56,6 +56,7 @@ export class AdminDashboard {
     }
 
     this.alertLoading = true;
+    this.broadcastForm.disable();
     this.alertMessage = '';
     this.alertError = '';
 
@@ -64,6 +65,7 @@ export class AdminDashboard {
 
     if (!parsedZone) {
       this.alertLoading = false;
+      this.broadcastForm.enable();
       this.alertError =
         'danger_zone must be valid GeoJSON Polygon JSON with coordinates.';
       return;
@@ -77,11 +79,13 @@ export class AdminDashboard {
     this.farmService.broadcastAlert(payload).subscribe({
       next: (response) => {
         this.alertLoading = false;
+        this.broadcastForm.enable();
         this.farmsNotified = response.farms_notified;
         this.alertMessage = response.message || 'Alert broadcast successful.';
       },
       error: (err) => {
         this.alertLoading = false;
+        this.broadcastForm.enable();
         this.alertError =
           err.error?.message || 'Alert broadcast failed. Please review payload.';
       },
@@ -98,6 +102,7 @@ export class AdminDashboard {
     }
 
     this.insightsLoading = true;
+    this.insightsForm.disable();
     this.insightsError = '';
     this.insightsData = null;
 
@@ -106,10 +111,12 @@ export class AdminDashboard {
     this.farmService.getRegionalInsights(regionName).subscribe({
       next: (response) => {
         this.insightsLoading = false;
+        this.insightsForm.enable();
         this.insightsData = response.data;
       },
       error: (err) => {
         this.insightsLoading = false;
+        this.insightsForm.enable();
         this.insightsError =
           err.error?.message ||
           'Regional insights unavailable for this region.';

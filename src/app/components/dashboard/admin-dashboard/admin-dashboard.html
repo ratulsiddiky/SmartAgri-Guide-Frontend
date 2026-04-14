@@ -18,7 +18,6 @@
                 id="alert_type"
                 class="form-select"
                 formControlName="alert_type"
-                [disabled]="alertLoading"
               >
                 <option value="Flood">Flood</option>
                 <option value="Wildfire">Wildfire</option>
@@ -34,7 +33,6 @@
                 rows="7"
                 class="form-control"
                 formControlName="danger_zone"
-                [disabled]="alertLoading"
                 placeholder='{"type":"Polygon","coordinates":[[[-5.95,54.55],[-5.85,54.55],[-5.85,54.62],[-5.95,54.62],[-5.95,54.55]]]}'
               ></textarea>
               @if (broadcastForm.controls.danger_zone.touched && broadcastForm.controls.danger_zone.invalid) {
@@ -78,7 +76,6 @@
                 type="text"
                 class="form-control"
                 formControlName="region_name"
-                [disabled]="insightsLoading"
                 placeholder="e.g. Belfast"
               />
               @if (insightsForm.controls.region_name.touched && insightsForm.controls.region_name.invalid) {
