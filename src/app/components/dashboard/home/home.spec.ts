@@ -2,6 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { Home } from './home';
 
+import { provideRouter } from '@angular/router';
+
 describe('Home', () => {
   let component: Home;
   let fixture: ComponentFixture<Home>;
@@ -9,6 +11,9 @@ describe('Home', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Home],
+      providers: [
+        provideRouter([])
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(Home);
@@ -17,6 +22,8 @@ describe('Home', () => {
   });
 
   it('should create', () => {
+    const fixture = TestBed.createComponent(Home);
+    const component = fixture.componentInstance;
     expect(component).toBeTruthy();
   });
 });

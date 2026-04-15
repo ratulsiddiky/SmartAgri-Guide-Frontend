@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { FarmService } from '../../../services/farm.service';
 import { Farm } from '../../../models/farm.model';
+import { SensorStatusPipe } from '../../../pipes/sensor-status.pipe';
 
 @Component({
   selector: 'app-farms-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, SensorStatusPipe],
   templateUrl: './farms-list.html',
   styleUrl: './farms-list.css',
 })
@@ -26,6 +27,15 @@ export class FarmsList implements OnInit {
   deletingFarmId = '';
 
   constructor(private readonly farmService: FarmService) {}
+
+  private getErrorMessage(error: unknown, fallback: string): string {
+    const backendMessage = (error as { error?: { message?: unknown } } | null)?.error
+      ?.message;
+
+    return typeof backendMessage === 'string' && backendMessage.trim()
+      ? backendMessage
+      : fallback;
+  }
 
   /**
    * Loads the first page of farm records when the view is initialized.
@@ -51,11 +61,17 @@ export class FarmsList implements OnInit {
         this.loading = false;
       },
       error: (err) => {
-        console.error('Failed to load farms:', err);
+        console.error(
+          this.getErrorMessage(
+            err,
+            'Unable to load farms right now. Please try again shortly.'
+          )
+        );
         this.error = true;
-        this.errorMessage =
-          err.error?.message ||
-          'Could not connect to the server. Please make sure the backend is running on port 5001.';
+        this.errorMessage = this.getErrorMessage(
+          err,
+          'Could not connect to the server. Please make sure the backend is running on port 5001.'
+        );
         this.loading = false;
       },
     });
@@ -85,10 +101,17 @@ export class FarmsList implements OnInit {
         this.loading = false;
       },
       error: (err) => {
-        console.error('Failed to search farms:', err);
+        console.error(
+          this.getErrorMessage(
+            err,
+            `Unable to search farms for '${searchTerm}'. Please try a different term.`
+          )
+        );
         this.error = true;
-        this.errorMessage =
-          err.error?.message || 'Search failed. Please try a different term.';
+        this.errorMessage = this.getErrorMessage(
+          err,
+          'Search failed. Please try a different term.'
+        );
         this.loading = false;
       },
     });
@@ -168,9 +191,10 @@ export class FarmsList implements OnInit {
       error: (err) => {
         this.deletingFarmId = '';
         this.error = true;
-        this.errorMessage =
-          err.error?.message ||
-          'Delete failed. You may need admin permissions to remove this farm.';
+        this.errorMessage = this.getErrorMessage(
+          err,
+          'Delete failed. You may need admin permissions to remove this farm.'
+        );
       },
     });
   }

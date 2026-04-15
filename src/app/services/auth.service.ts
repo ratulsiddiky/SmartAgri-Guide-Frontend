@@ -85,6 +85,7 @@ export class AuthService {
 
   setSession(data: AuthResponse) {
     localStorage.setItem('token', data.token);
+    localStorage.setItem('auth_token', data.token);
     localStorage.setItem('username', data.username);
 
     if (data.role) {
@@ -102,6 +103,7 @@ export class AuthService {
 
   clearSession() {
     localStorage.removeItem('token');
+    localStorage.removeItem('auth_token');
     localStorage.removeItem('username');
     localStorage.removeItem('role');
     this.currentUserSignal.set(null);
@@ -113,7 +115,7 @@ export class AuthService {
   }
 
   private readSession(): User | null {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
     const username = localStorage.getItem('username');
 
     if (!token || !username) {

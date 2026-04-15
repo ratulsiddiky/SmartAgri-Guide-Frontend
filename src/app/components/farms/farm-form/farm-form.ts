@@ -42,10 +42,20 @@ export class FarmForm implements OnInit {
     private readonly notificationService: NotificationService
   ) {}
 
+  private getErrorMessage(error: unknown, fallback: string): string {
+    const backendMessage = (error as { error?: { message?: unknown } } | null)?.error
+      ?.message;
+
+    return typeof backendMessage === 'string' && backendMessage.trim()
+      ? backendMessage
+      : fallback;
+  }
+
   /**
    * Initializes form mode and loads existing farm data for edit flow.
    */
   ngOnInit(): void {
+    this.farmForm.enable();
     this.farmId = this.route.snapshot.paramMap.get('id') || '';
     this.isEditMode = !!this.farmId;
 
@@ -60,6 +70,7 @@ export class FarmForm implements OnInit {
   loadFarmForEdit(): void {
     this.loading = true;
     this.errorMessage = '';
+    this.farmForm.disable();
 
     this.apiService.getFarmById(this.farmId).subscribe({
       next: (farm) => {
@@ -69,11 +80,15 @@ export class FarmForm implements OnInit {
           area_name: farm.address?.area_name || '',
         });
         this.loading = false;
+        this.farmForm.enable();
       },
       error: (err) => {
-        this.errorMessage =
-          err.error?.message || 'Unable to load farm details for editing.';
+        this.errorMessage = this.getErrorMessage(
+          err,
+          `Unable to load farm '${this.farmId}' for editing. Please refresh and try again.`
+        );
         this.loading = false;
+        this.farmForm.enable();
       },
     });
   }
@@ -98,6 +113,7 @@ export class FarmForm implements OnInit {
     this.submitting = true;
     this.errorMessage = '';
     this.successMessage = '';
+    this.farmForm.disable();
 
     if (this.isEditMode) {
       this.updateFarm(payload);
@@ -120,6 +136,7 @@ export class FarmForm implements OnInit {
         this.successMessage = response.message || 'Farm created successfully.';
         this.notificationService.showSuccess(this.successMessage);
         this.submitting = false;
+        this.farmForm.enable();
         const createdFarmId = response.farm_id;
         if (createdFarmId) {
           void this.router.navigate(['/farms', createdFarmId]);
@@ -128,10 +145,13 @@ export class FarmForm implements OnInit {
         void this.router.navigate(['/farms']);
       },
       error: (err) => {
-        this.errorMessage =
-          err.error?.message || 'Unable to create farm. Please try again.';
+        this.errorMessage = this.getErrorMessage(
+          err,
+          'Unable to create the farm. Please correct the form fields and try again.'
+        );
         this.notificationService.showError(this.errorMessage);
         this.submitting = false;
+        this.farmForm.enable();
       },
     });
   }
@@ -149,13 +169,17 @@ export class FarmForm implements OnInit {
         this.successMessage = response.message || 'Farm updated successfully.';
         this.notificationService.showSuccess(this.successMessage);
         this.submitting = false;
+        this.farmForm.enable();
         void this.router.navigate(['/farms', this.farmId]);
       },
       error: (err) => {
-        this.errorMessage =
-          err.error?.message || 'Unable to update farm. Please try again.';
+        this.errorMessage = this.getErrorMessage(
+          err,
+          `Unable to update farm '${this.farmId}'. Please review your changes and try again.`
+        );
         this.notificationService.showError(this.errorMessage);
         this.submitting = false;
+        this.farmForm.enable();
       },
     });
   }

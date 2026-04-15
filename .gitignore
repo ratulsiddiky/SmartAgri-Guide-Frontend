@@ -19,6 +19,9 @@ yarn-error.log
 *.launch
 .settings/
 *.sublime-workspace
+.env
+*.temp
+*.log
 
 # Visual Studio Code
 .vscode/*
@@ -38,6 +41,7 @@ yarn-error.log
 testem.log
 /typings
 __screenshots__/
+__pycache__/
 
 # System files
 .DS_Store

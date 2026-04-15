@@ -46,6 +46,15 @@ export class FarmDetail implements OnInit {
     private readonly farmService: FarmService
   ) {}
 
+  private getErrorMessage(error: unknown, fallback: string): string {
+    const backendMessage = (error as { error?: { message?: unknown } } | null)?.error
+      ?.message;
+
+    return typeof backendMessage === 'string' && backendMessage.trim()
+      ? backendMessage
+      : fallback;
+  }
+
   get farmId(): string {
     return this.route.snapshot.paramMap.get('id') || '';
   }
@@ -65,7 +74,12 @@ export class FarmDetail implements OnInit {
         this.loadIrrigation();
       },
       error: (err) => {
-        console.error('Failed to load farm:', err);
+        console.error(
+          this.getErrorMessage(
+            err,
+            `Unable to load farm '${this.farmId}'. Please refresh and try again.`
+          )
+        );
         this.error = true;
         this.loading = false;
       },
@@ -78,7 +92,14 @@ export class FarmDetail implements OnInit {
   loadInsights() {
     this.farmService.getFarmInsights(this.farmId).subscribe({
       next: (data) => (this.insights = data.dashboard_data as FarmInsights),
-      error: () => {},
+      error: (err) => {
+        console.error(
+          this.getErrorMessage(
+            err,
+            `Unable to load insights for farm '${this.farmId}'.`
+          )
+        );
+      },
     });
   }
 
@@ -88,7 +109,14 @@ export class FarmDetail implements OnInit {
   loadIrrigation() {
     this.farmService.checkIrrigation(this.farmId).subscribe({
       next: (data) => (this.irrigation = data as IrrigationStatus),
-      error: () => {},
+      error: (err) => {
+        console.error(
+          this.getErrorMessage(
+            err,
+            `Unable to calculate irrigation status for farm '${this.farmId}'.`
+          )
+        );
+      },
     });
   }
 
@@ -107,8 +135,12 @@ export class FarmDetail implements OnInit {
         this.ngOnInit();
       },
       error: (err) => {
-        this.syncMessage = `❌ ${err.error?.message || 'Sync failed.'}`;
-        this.showToast(err.error?.message || 'Sync failed.', 'danger');
+        const message = this.getErrorMessage(
+          err,
+          `Weather sync failed for farm '${this.farmId}'. Please verify the coordinates and try again.`
+        );
+        this.syncMessage = `❌ ${message}`;
+        this.showToast(message, 'danger');
         this.syncLoading = false;
       },
     });
@@ -131,7 +163,10 @@ export class FarmDetail implements OnInit {
         this.ngOnInit();
       },
       error: (err) => {
-        this.sensorMessage = err.error?.message || 'Failed to add sensor.';
+        this.sensorMessage = this.getErrorMessage(
+          err,
+          `Unable to add the sensor to farm '${this.farmId}'. Please check the sensor details and try again.`
+        );
       },
     });
   }

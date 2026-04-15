@@ -9,25 +9,22 @@ import {
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 import { authInterceptor } from './auth.interceptor';
-import { AuthService } from '../services/auth.service';
 
 describe('authInterceptor', () => {
   beforeEach(() => {
+    localStorage.clear();
+
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(withInterceptors([authInterceptor])),
         provideHttpClientTesting(),
-        {
-          provide: AuthService,
-          useValue: {
-            getToken: () => 'test-token-123',
-          },
-        },
       ],
     });
   });
 
   it('should attach Bearer token to outgoing requests', () => {
+    localStorage.setItem('auth_token', 'test-token-123');
+
     const http = TestBed.inject(HttpClient);
     const httpMock = TestBed.inject(HttpTestingController);
 
@@ -35,6 +32,18 @@ describe('authInterceptor', () => {
 
     const req = httpMock.expectOne('/api/test');
     expect(req.request.headers.get('Authorization')).toBe('Bearer test-token-123');
+    req.flush({});
+    httpMock.verify();
+  });
+
+  it('should pass through requests without Authorization when token is missing', () => {
+    const http = TestBed.inject(HttpClient);
+    const httpMock = TestBed.inject(HttpTestingController);
+
+    http.get('/api/test').subscribe();
+
+    const req = httpMock.expectOne('/api/test');
+    expect(req.request.headers.has('Authorization')).toBe(false);
     req.flush({});
     httpMock.verify();
   });

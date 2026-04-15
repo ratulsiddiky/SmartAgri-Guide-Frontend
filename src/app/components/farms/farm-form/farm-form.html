@@ -30,7 +30,6 @@
               class="form-control"
               formControlName="farm_name"
               placeholder="e.g. Green Valley Farm"
-              [disabled]="submitting"
             />
             @if (farmForm.controls.farm_name.touched && farmForm.controls.farm_name.invalid) {
               <div class="text-danger small mt-1">Farm name is required.</div>
@@ -45,7 +44,6 @@
               class="form-control"
               formControlName="crop_type"
               placeholder="e.g. Wheat"
-              [disabled]="submitting"
             />
             @if (farmForm.controls.crop_type.touched && farmForm.controls.crop_type.invalid) {
               <div class="text-danger small mt-1">Crop type is required.</div>
@@ -60,7 +58,6 @@
               class="form-control"
               formControlName="area_name"
               placeholder="e.g. County Antrim"
-              [disabled]="submitting"
             />
             @if (farmForm.controls.area_name.touched && farmForm.controls.area_name.invalid) {
               <div class="text-danger small mt-1">Area name is required.</div>

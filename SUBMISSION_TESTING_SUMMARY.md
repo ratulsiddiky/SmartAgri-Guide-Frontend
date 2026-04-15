@@ -2,6 +2,15 @@
 
 This document summarizes the automated testing strategy used in AgriGuide to provide clear evidence for the CW2 criterion: **Evidence of automated application testing**.
 
+## How Tests Are Executed
+
+- Development mode (watch): `npm run test`
+- Submission/CI mode (single run): `npm run test:ci`
+
+Latest execution used for this submission:
+- Command: `npm run test:ci`
+- Result: **12 test files passed, 18 tests passed, 0 failed**
+
 ## Testing Strategy Overview
 
 AgriGuide uses focused unit/component tests to validate critical user journeys and security flows rather than only shallow component creation checks.

@@ -11,7 +11,9 @@ import { GlobalAlert } from './components/shared/global-alert/global-alert';
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
+
 export class AppComponent {
+  title = 'smart-agri-guide-frontend';
   constructor(
     public auth: AuthService,
     private readonly router: Router

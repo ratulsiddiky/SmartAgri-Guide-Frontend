@@ -85,6 +85,17 @@
                 </span>
               </li>
             </ul>
+
+            @if (farm.sensors && farm.sensors.length > 0 && farm.sensors[0].readings && farm.sensors[0].readings.length > 0) {
+              @let latestReading = farm.sensors[0].readings[farm.sensors[0].readings.length - 1];
+              <div class="small text-muted">
+                Latest moisture reading:
+                <strong>{{ latestReading.value }}%</strong>
+                <span class="badge bg-light text-dark ms-2">
+                  {{ latestReading.value | sensorStatus }}
+                </span>
+              </div>
+            }
           </div>
 
           <div class="card-footer bg-white border-top-0">

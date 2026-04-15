@@ -46,6 +46,15 @@ export class AdminDashboard {
 
   constructor(private readonly farmService: FarmService) {}
 
+  private getErrorMessage(error: unknown, fallback: string): string {
+    const backendMessage = (error as { error?: { message?: unknown } } | null)?.error
+      ?.message;
+
+    return typeof backendMessage === 'string' && backendMessage.trim()
+      ? backendMessage
+      : fallback;
+  }
+
   /**
    * Broadcasts an admin alert to farms within the provided GeoJSON polygon.
    */
@@ -82,8 +91,10 @@ export class AdminDashboard {
       },
       error: (err) => {
         this.alertLoading = false;
-        this.alertError =
-          err.error?.message || 'Alert broadcast failed. Please review payload.';
+        this.alertError = this.getErrorMessage(
+          err,
+          'Alert broadcast failed. Please review the GeoJSON polygon and alert type.'
+        );
       },
     });
   }
@@ -110,9 +121,10 @@ export class AdminDashboard {
       },
       error: (err) => {
         this.insightsLoading = false;
-        this.insightsError =
-          err.error?.message ||
-          'Regional insights unavailable for this region.';
+        this.insightsError = this.getErrorMessage(
+          err,
+          'Regional insights are unavailable for this region. Please try another area name.'
+        );
       },
     });
   }
