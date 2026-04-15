@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs/operators';
 import { Farm, FarmSensor } from '../../../models/farm.model';
 import { FarmService } from '../../../services/farm.service';
 import { HighlightStatusDirective } from '../../../directives/highlight-status.directive';
@@ -31,6 +32,7 @@ export class FarmDetail implements OnInit {
   irrigation: IrrigationStatus | null = null;
   loading = true;
   error = false;
+  errorMessage = '';
 
   syncLoading = false;
   syncMessage = '';
@@ -65,25 +67,34 @@ export class FarmDetail implements OnInit {
   ngOnInit() {
     this.loading = true;
     this.error = false;
+    this.errorMessage = '';
 
-    this.farmService.getFarmById(this.farmId).subscribe({
-      next: (data) => {
-        this.farm = data;
-        this.loading = false;
-        this.loadInsights();
-        this.loadIrrigation();
-      },
-      error: (err) => {
-        console.error(
-          this.getErrorMessage(
+    if (!this.farmId || this.farmId === 'undefined') {
+      this.error = true;
+      this.errorMessage =
+        'The farm identifier is missing or invalid. Please return to All Farms and try again.';
+      this.loading = false;
+      return;
+    }
+
+    this.farmService
+      .getFarmById(this.farmId)
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe({
+        next: (data) => {
+          this.farm = data;
+          this.loadInsights();
+          this.loadIrrigation();
+        },
+        error: (err) => {
+          this.error = true;
+          this.errorMessage = this.getErrorMessage(
             err,
             `Unable to load farm '${this.farmId}'. Please refresh and try again.`
-          )
-        );
-        this.error = true;
-        this.loading = false;
-      },
-    });
+          );
+          console.error(this.errorMessage);
+        },
+      });
   }
 
   /**

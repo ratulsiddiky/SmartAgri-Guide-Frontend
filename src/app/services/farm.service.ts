@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, timeout } from 'rxjs/operators';
 import {
   ApiService,
   BroadcastAlertRequest,
@@ -56,6 +56,10 @@ export class FarmService {
     }
 
     if (error instanceof Error && error.message.trim()) {
+      if (error.message.toLowerCase().includes('timeout')) {
+        return 'The server took too long to process this farm request. Please try again.';
+      }
+
       return error.message;
     }
 
@@ -115,6 +119,7 @@ export class FarmService {
 
   getFarmById(id: string) {
     return this.api.getFarmById(id).pipe(
+      timeout(12000),
       catchError((error) =>
         this.rethrowAsHttpError(
           error,
@@ -218,6 +223,7 @@ export class FarmService {
    */
   broadcastAlert(payload: BroadcastAlertRequest) {
     return this.api.broadcastAlert(payload).pipe(
+      timeout(12000),
       catchError((error) =>
         this.rethrowAsHttpError(
           error,

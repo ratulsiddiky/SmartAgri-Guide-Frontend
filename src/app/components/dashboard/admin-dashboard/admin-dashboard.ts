@@ -6,6 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { finalize } from 'rxjs/operators';
 import { FarmService } from '../../../services/farm.service';
 import { BroadcastAlertRequest } from '../../../services/api.service';
 
@@ -83,20 +84,21 @@ export class AdminDashboard {
       danger_zone: parsedZone,
     };
 
-    this.farmService.broadcastAlert(payload).subscribe({
-      next: (response) => {
-        this.alertLoading = false;
-        this.farmsNotified = response.farms_notified;
-        this.alertMessage = response.message || 'Alert broadcast successful.';
-      },
-      error: (err) => {
-        this.alertLoading = false;
-        this.alertError = this.getErrorMessage(
-          err,
-          'Alert broadcast failed. Please review the GeoJSON polygon and alert type.'
-        );
-      },
-    });
+    this.farmService
+      .broadcastAlert(payload)
+      .pipe(finalize(() => (this.alertLoading = false)))
+      .subscribe({
+        next: (response) => {
+          this.farmsNotified = response.farms_notified;
+          this.alertMessage = response.message || 'Alert broadcast successful.';
+        },
+        error: (err) => {
+          this.alertError = this.getErrorMessage(
+            err,
+            'Alert broadcast failed. The request timed out or the server could not process the GeoJSON polygon.'
+          );
+        },
+      });
   }
 
   /**

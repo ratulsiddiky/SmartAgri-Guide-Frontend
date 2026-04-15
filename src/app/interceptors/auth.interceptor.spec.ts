@@ -47,4 +47,32 @@ describe('authInterceptor', () => {
     req.flush({});
     httpMock.verify();
   });
+
+  it('should attach Bearer token from legacy token storage key', () => {
+    localStorage.setItem('token', 'legacy-token-456');
+
+    const http = TestBed.inject(HttpClient);
+    const httpMock = TestBed.inject(HttpTestingController);
+
+    http.get('/api/protected').subscribe();
+
+    const req = httpMock.expectOne('/api/protected');
+    expect(req.request.headers.get('Authorization')).toBe('Bearer legacy-token-456');
+    req.flush({});
+    httpMock.verify();
+  });
+
+  it('should not attach Bearer token for login endpoint requests', () => {
+    localStorage.setItem('auth_token', 'test-token-123');
+
+    const http = TestBed.inject(HttpClient);
+    const httpMock = TestBed.inject(HttpTestingController);
+
+    http.post('/api/login', {}).subscribe();
+
+    const req = httpMock.expectOne('/api/login');
+    expect(req.request.headers.has('Authorization')).toBe(false);
+    req.flush({});
+    httpMock.verify();
+  });
 });

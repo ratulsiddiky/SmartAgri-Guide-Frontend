@@ -16,7 +16,7 @@
 
   @if (error) {
     <div class="alert alert-danger">
-      ❌ Could not load this farm.
+      ❌ {{ errorMessage || 'Could not load this farm.' }}
       <a routerLink="/farms" class="alert-link ms-2">← Back to Farms</a>
     </div>
   }
