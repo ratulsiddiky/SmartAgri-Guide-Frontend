@@ -46,10 +46,10 @@ export const protectedRoutes: Routes = [
           ),
       },
       {
-        path: 'businesses',
+        path: 'agri-markets',
         loadComponent: () =>
-          import('./components/dashboard/businesses/businesses').then(
-            (m) => m.Businesses
+          import('./components/dashboard/agri-markets/agri-markets').then(
+            (m) => m.AgriMarkets
           ),
       },
       {

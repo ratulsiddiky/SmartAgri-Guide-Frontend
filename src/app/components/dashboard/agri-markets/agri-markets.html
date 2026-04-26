@@ -1,8 +1,9 @@
 <div class="container mt-4">
-  <h2 class="text-success mb-2">🔍 Search Farms</h2>
-  <p class="text-muted mb-4">Search for farms by name or area.</p>
+  <h2 class="text-success mb-2">🌾 Agri Markets Explorer</h2>
+  <p class="text-muted mb-4">
+    Discover farms and agricultural market participants by name or region.
+  </p>
 
-  <!-- Search bar -->
   <div class="row g-2 mb-4">
     <div class="col-md-8">
       <input
@@ -14,9 +15,11 @@
       />
     </div>
     <div class="col-md-2">
-      <button class="btn btn-success btn-lg w-100"
+      <button
+        class="btn btn-success btn-lg w-100"
         (click)="onSearch()"
-        [disabled]="loading">
+        [disabled]="loading"
+      >
         @if (loading) {
           <span class="spinner-border spinner-border-sm"></span>
         } @else {
@@ -25,19 +28,16 @@
       </button>
     </div>
     <div class="col-md-2">
-      <button class="btn btn-outline-secondary btn-lg w-100"
-        (click)="clearSearch()">
+      <button class="btn btn-outline-secondary btn-lg w-100" (click)="clearSearch()">
         Clear
       </button>
     </div>
   </div>
 
-  <!-- Validation error -->
   @if (errorMessage) {
     <div class="alert alert-warning">{{ errorMessage }}</div>
   }
 
-  <!-- Results -->
   @if (searched && !loading) {
     @if (results.length > 0) {
       <p class="text-muted mb-3">
@@ -51,7 +51,7 @@
               <div class="card-body">
                 <h5 class="card-title text-success">{{ farm.farm_name }}</h5>
                 <h6 class="card-subtitle mb-2 text-muted">
-                  🌾 {{ farm.crop_type || 'Crop not specified' }}
+                  🌱 {{ farm.crop_type || 'Crop not specified' }}
                 </h6>
                 @if (farm.address) {
                   <p class="small text-muted mb-2">
@@ -59,16 +59,17 @@
                     {{ farm.address.postcode ? ', ' + farm.address.postcode : '' }}
                   </p>
                 }
-                <span class="badge"
+                <span
+                  class="badge"
                   [class.bg-danger]="(farm.alerts_history?.length ?? 0) > 0"
-                  [class.bg-success]="(farm.alerts_history?.length ?? 0) === 0">
+                  [class.bg-success]="(farm.alerts_history?.length ?? 0) === 0"
+                >
                   {{ (farm.alerts_history?.length ?? 0) > 0 ? '⚠️ Active Alert' : '✅ All Clear' }}
                 </span>
               </div>
               <div class="card-footer bg-white border-top-0">
-                <a class="btn btn-outline-success btn-sm w-100"
-                  [routerLink]="['/farms', farm._id]">
-                  View Dashboard →
+                <a class="btn btn-outline-success btn-sm w-100" [routerLink]="['/farms', farm._id]">
+                  View Farm Details →
                 </a>
               </div>
             </div>
@@ -83,12 +84,10 @@
     }
   }
 
-  <!-- Pre-search hint -->
   @if (!searched && !errorMessage) {
     <div class="text-center text-muted mt-5 py-5">
       <p class="fs-1">🌾</p>
       <p>Enter a farm name or area above and press Search.</p>
     </div>
   }
-
 </div>

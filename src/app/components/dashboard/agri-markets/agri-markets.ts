@@ -6,13 +6,13 @@ import { Farm } from '../../../models/farm.model';
 import { FarmService } from '../../../services/farm.service';
 
 @Component({
-  selector: 'app-businesses',
+  selector: 'app-agri-markets',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: './businesses.html',
-  styleUrl: './businesses.css',
+  templateUrl: './agri-markets.html',
+  styleUrl: './agri-markets.css',
 })
-export class Businesses {
+export class AgriMarkets {
   searchQuery = '';
   results: Farm[] = [];
   searched = false;
