@@ -1,9 +1,8 @@
 <div class="container mt-5">
-  <div class="text-center py-5">
-    <h1 class="display-4 text-success fw-bold">Welcome to SmartAgri Guide</h1>
-    <p class="lead text-muted mt-3 mb-4">
-      Monitor your farms, track live weather, manage IoT sensors, and receive
-      real-time disaster alerts all from one dashboard.
+  <div class="hero-section text-center py-5 rounded-4 mb-5">
+    <h1 class="display-3 fw-bold">Welcome to SmartAgri Guide</h1>
+    <p class="lead mb-4 px-3">
+      Modern technology for sustainable farming.
     </p>
     <div class="d-flex justify-content-center gap-3 flex-wrap">
       <a routerLink="/farms" class="btn btn-success btn-lg">View All Farms</a>
@@ -18,11 +17,13 @@
 
   <hr class="my-5" />
 
-  <div class="row g-4 mb-5">
+  <div class="row g-4 mb-5 feature-cards">
     <div class="col-md-4">
       <div class="card border-success shadow-sm h-100">
         <div class="card-body">
-          <h5 class="card-title text-success">Live Weather Tracking</h5>
+          <h5 class="card-title text-success">
+            <span class="live-indicator"></span>Live Weather Tracking
+          </h5>
           <p class="card-text text-muted">
             Sync real-time weather data into each farm record for better
             monitoring and trend analysis.
@@ -33,7 +34,7 @@
     <div class="col-md-4">
       <div class="card border-success shadow-sm h-100">
         <div class="card-body">
-          <h5 class="card-title text-success">IoT Sensor Monitoring</h5>
+          <h5 class="card-title text-success">📡 IoT Sensor Monitoring</h5>
           <p class="card-text text-muted">
             Connect soil, temperature, and humidity sensors to improve field
             visibility and irrigation decisions.
@@ -44,7 +45,7 @@
     <div class="col-md-4">
       <div class="card border-success shadow-sm h-100">
         <div class="card-body">
-          <h5 class="card-title text-success">Geo-Targeted Alerts</h5>
+          <h5 class="card-title text-success">🚨 Geo-Targeted Alerts</h5>
           <p class="card-text text-muted">
             Receive location-aware alerts for weather and operational risks tied
             directly to the farm.

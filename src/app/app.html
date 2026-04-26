@@ -1,10 +1,12 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-success mb-4">
+<nav class="navbar navbar-expand-lg navbar-dark site-navbar mb-4">
   <div class="container">
     <a class="navbar-brand fw-bold" routerLink="/">SmartAgri Guide</a>
 
     <button
       class="navbar-toggler"
       type="button"
+      aria-label="Toggle navigation"
+      title="Toggle navigation"
       data-bs-toggle="collapse"
       data-bs-target="#navbarNav"
     >
@@ -12,48 +14,34 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto align-items-lg-center">
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/farms">All Farms</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/agri-markets">Agri-Markets</a>
-        </li>
-
+      <div class="navbar-nav ms-auto align-items-lg-center flex-wrap gap-0 gap-lg-2">
+        <a class="nav-link" routerLink="/">Home</a>
+        <a class="nav-link" routerLink="/farms">All Farms</a>
+        <a class="nav-link" routerLink="/agri-markets">Agri-Markets</a>
         @if (auth.isLoggedIn() && auth.getRole() === 'admin') {
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/admin">Admin Dashboard</a>
-          </li>
+          <a class="nav-link" routerLink="/admin">Admin Dashboard</a>
         }
-
         @if (!auth.isLoggedIn()) {
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/login">Login</a>
-          </li>
+          <a class="nav-link" routerLink="/login">Login</a>
         }
-
         @if (auth.isLoggedIn()) {
-          <li class="nav-item">
-            <span class="nav-link text-warning fw-semibold">
-              User {{ auth.getUsername() }}
-            </span>
-          </li>
-          <li class="nav-item">
-            <button class="btn btn-outline-light btn-sm ms-2" (click)="logout()">
-              Logout
-            </button>
-          </li>
+          <span class="nav-link text-warning fw-semibold">User {{ auth.getUsername() }}</span>
+          <button class="btn btn-outline-light btn-sm ms-lg-2" (click)="logout()">Logout</button>
         }
-      </ul>
+      </div>
     </div>
   </div>
 </nav>
 
 <app-global-alert></app-global-alert>
 
-<div class="container">
+<main class="container app-shell">
   <router-outlet></router-outlet>
-</div>
+</main>
+
+<footer class="site-footer mt-5">
+  <div class="container py-3 d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+    <span class="fw-semibold">SmartAgri Guide</span>
+    <span class="small">Agricultural insight, weather, and farm management in one place.</span>
+  </div>
+</footer>

@@ -47,7 +47,13 @@
   </div>
 
   @if (loading) {
-    <div class="alert alert-info shadow-sm">⏳ Loading farm data...</div>
+    <div class="row">
+      @for (item of [1, 2, 3]; track $index) {
+        <div class="col-md-4 mb-4">
+          <div class="card skeleton skeleton-height border-0"></div>
+        </div>
+      }
+    </div>
   }
 
   @if (error) {
@@ -129,12 +135,35 @@
     } @empty {
       @if (!loading && !error) {
         <div class="col-12">
-          <div class="alert alert-warning shadow-sm">
-            @if (query.trim()) {
-              No farms found for "{{ query }}".
-            } @else {
-              No farms registered yet.
-            }
+          <div class="card border-0 shadow-sm text-center py-5">
+            <div class="card-body">
+              <div class="empty-state-icon">
+                @if (query.trim()) {
+                  🔍
+                } @else {
+                  🚜
+                }
+              </div>
+              <h5 class="card-title text-muted">
+                @if (query.trim()) {
+                  No farms found for "{{ query }}"
+                } @else {
+                  No farms registered yet
+                }
+              </h5>
+              <p class="card-text text-muted small mb-3">
+                @if (query.trim()) {
+                  Try adjusting your search filters or create a new farm
+                } @else {
+                  Get started by adding your first farm to begin monitoring
+                }
+              </p>
+              @if (!query.trim()) {
+                <a routerLink="/farms/new" class="btn btn-success btn-sm">
+                  + Create Your First Farm
+                </a>
+              }
+            </div>
           </div>
         </div>
       }
