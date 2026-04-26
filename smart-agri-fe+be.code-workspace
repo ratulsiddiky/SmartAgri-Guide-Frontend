@@ -12,5 +12,18 @@
 		{
 			"path": "../OneDrive - Ulster University/Data/SEM_5/COM661_Full-stack Strategies and Development - 5th/Assgn Spec"
 		}
-	]
+	],
+	"settings": {
+		"github.copilot.chat.copilotMemory.enabled": true,
+		"github.copilot.chat.gpt54LargePrompt.enabled": true,
+		"github.copilot.chat.languageContext.fix.typescript.enabled": true,
+		"github.copilot.chat.languageContext.inline.typescript.enabled": true,
+		"github.copilot.chat.switchAgent.enabled": true,
+		"github.copilot.chat.gpt54ConcisePrompt.enabled": true,
+		"github.copilot.chat.anthropic.contextEditing.mode": "clear-both",
+		"github.copilot.chat.alternateGptPrompt.enabled": true,
+		"github.copilot.chat.alternateGeminiModelFPrompt.enabled": true,
+		"github.copilot.chat.terminalChatLocation": "quickChat",
+		"github.copilot.chat.rateLimitAutoSwitchToAuto": true
+	}
 }
