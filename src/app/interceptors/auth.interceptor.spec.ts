@@ -48,7 +48,7 @@ describe('authInterceptor', () => {
     httpMock.verify();
   });
 
-  it('should attach Bearer token from legacy token storage key', () => {
+  it('should ignore legacy token key when auth_token is missing', () => {
     localStorage.setItem('token', 'legacy-token-456');
 
     const http = TestBed.inject(HttpClient);
@@ -57,7 +57,7 @@ describe('authInterceptor', () => {
     http.get('/api/protected').subscribe();
 
     const req = httpMock.expectOne('/api/protected');
-    expect(req.request.headers.get('Authorization')).toBe('Bearer legacy-token-456');
+    expect(req.request.headers.has('Authorization')).toBe(false);
     req.flush({});
     httpMock.verify();
   });
