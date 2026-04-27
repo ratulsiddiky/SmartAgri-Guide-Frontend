@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { AdminDashboard } from './admin-dashboard';
 import { FarmService } from '../../../services/farm.service';
+import { AuthService } from '../../../services/auth.service';
 
 describe('AdminDashboard', () => {
   let component: AdminDashboard;
@@ -16,6 +17,11 @@ describe('AdminDashboard', () => {
         broadcastCalled = true;
         return of({ message: 'Alert broadcast!', farms_notified: 2 });
       },
+      getFarms: () =>
+        of({
+          data: [],
+          pagination: { page: 1, limit: 1, total: 8, has_next: false },
+        }),
       getRegionalInsights: () =>
         of({
           message: 'Community averages',
@@ -23,9 +29,16 @@ describe('AdminDashboard', () => {
         }),
     } as unknown as FarmService;
 
+    const authServiceStub = {
+      currentUserSignal: () => ({ username: 'admin', role: 'admin', token: 'x' }),
+    } as unknown as AuthService;
+
     await TestBed.configureTestingModule({
       imports: [AdminDashboard],
-      providers: [{ provide: FarmService, useValue: farmServiceStub }],
+      providers: [
+        { provide: FarmService, useValue: farmServiceStub },
+        { provide: AuthService, useValue: authServiceStub },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdminDashboard);

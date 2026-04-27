@@ -18,6 +18,11 @@ export class Home implements OnInit {
   totalFarms = 0;
   isLoadingStats = true;
 
+  get greetingName(): string {
+    const user = this.authService.currentUserSignal();
+    return user?.username || 'Farmer';
+  }
+
   ngOnInit() {
     this.farmService.getFarms(1, 1).subscribe({
       next: (res) => {

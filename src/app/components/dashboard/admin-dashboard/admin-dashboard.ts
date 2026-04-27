@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormControl,
@@ -9,6 +9,7 @@ import {
 import { finalize } from 'rxjs/operators';
 import { FarmService } from '../../../services/farm.service';
 import { BroadcastAlertRequest } from '../../../services/api.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -17,7 +18,9 @@ import { BroadcastAlertRequest } from '../../../services/api.service';
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.css',
 })
-export class AdminDashboard {
+export class AdminDashboard implements OnInit {
+  readonly authService = inject(AuthService);
+
   readonly broadcastForm = new FormGroup({
     alert_type: new FormControl('Flood', {
       nonNullable: true,
@@ -42,10 +45,68 @@ export class AdminDashboard {
   alertError = '';
   insightsError = '';
   farmsNotified = 0;
+  totalFarmsTracked = 0;
+  statsLoading = true;
   insightsData: { community_avg_temp: number; total_farms_included: number } | null =
     null;
 
   constructor(private readonly farmService: FarmService) {}
+
+  get greetingName(): string {
+    const user = this.authService.currentUserSignal();
+
+    if (!user) {
+      return 'Admin';
+    }
+
+    if ((user.role || '').toLowerCase() === 'admin') {
+      return 'Admin';
+    }
+
+    return user.username || 'Admin';
+  }
+
+  ngOnInit(): void {
+    this.loadQuickStats();
+  }
+
+  private setBroadcastLoading(isLoading: boolean): void {
+    this.alertLoading = isLoading;
+
+    if (isLoading) {
+      this.broadcastForm.disable({ emitEvent: false });
+      return;
+    }
+
+    this.broadcastForm.enable({ emitEvent: false });
+  }
+
+  private setInsightsLoading(isLoading: boolean): void {
+    this.insightsLoading = isLoading;
+
+    if (isLoading) {
+      this.insightsForm.disable({ emitEvent: false });
+      return;
+    }
+
+    this.insightsForm.enable({ emitEvent: false });
+  }
+
+  private loadQuickStats(): void {
+    this.statsLoading = true;
+
+    this.farmService.getFarms(1, 1).subscribe({
+      next: (response) => {
+        this.totalFarmsTracked =
+          response.pagination?.total ?? response.data?.length ?? 0;
+        this.statsLoading = false;
+      },
+      error: () => {
+        this.totalFarmsTracked = 0;
+        this.statsLoading = false;
+      },
+    });
+  }
 
   private getErrorMessage(error: unknown, fallback: string): string {
     const backendMessage = (error as { error?: { message?: unknown } } | null)?.error
@@ -65,7 +126,7 @@ export class AdminDashboard {
       return;
     }
 
-    this.alertLoading = true;
+    this.setBroadcastLoading(true);
     this.alertMessage = '';
     this.alertError = '';
 
@@ -73,7 +134,7 @@ export class AdminDashboard {
     const parsedZone = this.parseDangerZone(rawZone);
 
     if (!parsedZone) {
-      this.alertLoading = false;
+      this.setBroadcastLoading(false);
       this.alertError =
         'danger_zone must be valid GeoJSON Polygon JSON with coordinates.';
       return;
@@ -86,7 +147,7 @@ export class AdminDashboard {
 
     this.farmService
       .broadcastAlert(payload)
-      .pipe(finalize(() => (this.alertLoading = false)))
+      .pipe(finalize(() => this.setBroadcastLoading(false)))
       .subscribe({
         next: (response) => {
           this.farmsNotified = response.farms_notified;
@@ -110,25 +171,26 @@ export class AdminDashboard {
       return;
     }
 
-    this.insightsLoading = true;
+    this.setInsightsLoading(true);
     this.insightsError = '';
     this.insightsData = null;
 
     const regionName = this.insightsForm.controls.region_name.value.trim();
 
-    this.farmService.getRegionalInsights(regionName).subscribe({
-      next: (response) => {
-        this.insightsLoading = false;
-        this.insightsData = response.data;
-      },
-      error: (err) => {
-        this.insightsLoading = false;
-        this.insightsError = this.getErrorMessage(
-          err,
-          'Regional insights are unavailable for this region. Please try another area name.'
-        );
-      },
-    });
+    this.farmService
+      .getRegionalInsights(regionName)
+      .pipe(finalize(() => this.setInsightsLoading(false)))
+      .subscribe({
+        next: (response) => {
+          this.insightsData = response.data;
+        },
+        error: (err) => {
+          this.insightsError = this.getErrorMessage(
+            err,
+            'Regional insights are unavailable for this region. Please try another area name.'
+          );
+        },
+      });
   }
 
   /**
