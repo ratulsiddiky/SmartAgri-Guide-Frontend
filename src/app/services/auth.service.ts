@@ -28,7 +28,7 @@ export interface RegisterResponse {
 })
 export class AuthService {
   private readonly baseUrl = environment.apiBaseUrl;
-  private readonly currentUserSignal = signal<User | null>(this.readSession());
+  readonly currentUserSignal = signal<User | null>(this.readSession());
 
   constructor(
     private readonly http: HttpClient,

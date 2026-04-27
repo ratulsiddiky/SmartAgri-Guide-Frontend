@@ -1,11 +1,12 @@
 body {
   background:
-    linear-gradient(rgba(255, 255, 255, 0.88), rgba(239, 246, 255, 0.82)),
-    url('/assets/images/daisy-field.jpg');
+    linear-gradient(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)),
+    url('/assets/images/daisy-field.jpg') no-repeat center center fixed;
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
   min-height: 100vh;
+  margin: 0;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   color: #0f172a;
 }

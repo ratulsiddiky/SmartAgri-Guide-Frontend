@@ -1,56 +1,62 @@
 <div class="container mt-5">
-  <div class="hero-section text-center py-5 rounded-4 mb-5">
-    <h1 class="display-3 fw-bold">Welcome to SmartAgri Guide</h1>
-    <p class="lead mb-4 px-3">
-      Modern technology for sustainable farming.
+  <div class="glass-card text-center py-5 px-4 mb-5 shadow">
+    
+    <h1 class="display-4 text-success fw-bold mb-3">
+      <ng-container *ngIf="authService.currentUserSignal() as user; else defaultGreeting">
+        Welcome back, {{ user.username }}! 🌱
+      </ng-container>
+      <ng-template #defaultGreeting>Welcome to SmartAgri Guide 🌾</ng-template>
+    </h1>
+    
+    <div class="mb-4" *ngIf="!isLoadingStats && totalFarms > 0">
+      <span class="badge rounded-pill bg-success fs-6 px-4 py-2 shadow-sm text-white border border-light">
+        🌍 Currently tracking {{ totalFarms }} active farms
+      </span>
+    </div>
+
+    <p class="lead text-dark mt-3 mb-4 fw-medium">
+      Monitor your agricultural assets, track live weather conditions, manage IoT sensors, 
+      and receive real-time disaster alerts from one unified dashboard.
     </p>
-    <div class="d-flex justify-content-center gap-3 flex-wrap">
-      <a routerLink="/farms" class="btn btn-success btn-lg">View All Farms</a>
-      <a routerLink="/agri-markets" class="btn btn-outline-success btn-lg">
+
+    <div class="d-flex justify-content-center gap-3 flex-wrap mt-4">
+      <a routerLink="/farms" class="btn btn-success btn-lg shadow px-5 rounded-pill">View All Farms</a>
+      <a routerLink="/agri-markets" class="btn btn-light btn-lg text-success fw-bold shadow-sm px-5 rounded-pill border-success">
         Search Agri-Markets
       </a>
-      @if (!auth.isLoggedIn()) {
-        <a routerLink="/login" class="btn btn-outline-secondary btn-lg">Login</a>
-      }
     </div>
   </div>
 
-  <hr class="my-5" />
+  <div class="row g-4 mb-5">
+    <div class="col-md-3 col-sm-6">
+      <div class="glass-card p-4 h-100 border-0 text-center transition-hover">
+        <div class="display-4 mb-3">⛅</div>
+        <h5 class="text-success fw-bold">Live Weather</h5>
+        <p class="text-muted mb-0 small">Sync real-time meteorological data.</p>
+      </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-6">
+      <div class="glass-card p-4 h-100 border-0 text-center transition-hover">
+        <div class="display-4 mb-3">📡</div>
+        <h5 class="text-success fw-bold">IoT Sensors</h5>
+        <p class="text-muted mb-0 small">Monitor soil and crop health 24/7.</p>
+      </div>
+    </div>
 
-  <div class="row g-4 mb-5 feature-cards">
-    <div class="col-md-4">
-      <div class="card border-success shadow-sm h-100">
-        <div class="card-body">
-          <h5 class="card-title text-success">
-            <span class="live-indicator"></span>Live Weather Tracking
-          </h5>
-          <p class="card-text text-muted">
-            Sync real-time weather data into each farm record for better
-            monitoring and trend analysis.
-          </p>
-        </div>
+    <div class="col-md-3 col-sm-6">
+      <div class="glass-card p-4 h-100 border-0 text-center transition-hover">
+        <div class="display-4 mb-3">🚨</div>
+        <h5 class="text-success fw-bold">Geo-Alerts</h5>
+        <p class="text-muted mb-0 small">Receive targeted disaster warnings.</p>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="card border-success shadow-sm h-100">
-        <div class="card-body">
-          <h5 class="card-title text-success">📡 IoT Sensor Monitoring</h5>
-          <p class="card-text text-muted">
-            Connect soil, temperature, and humidity sensors to improve field
-            visibility and irrigation decisions.
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card border-success shadow-sm h-100">
-        <div class="card-body">
-          <h5 class="card-title text-success">🚨 Geo-Targeted Alerts</h5>
-          <p class="card-text text-muted">
-            Receive location-aware alerts for weather and operational risks tied
-            directly to the farm.
-          </p>
-        </div>
+
+    <div class="col-md-3 col-sm-6">
+      <div class="glass-card p-4 h-100 border-0 text-center transition-hover">
+        <div class="display-4 mb-3">📈</div>
+        <h5 class="text-success fw-bold">Data Insights</h5>
+        <p class="text-muted mb-0 small">Actionable regional analytics.</p>
       </div>
     </div>
   </div>

@@ -54,3 +54,13 @@
     box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
   }
 }
+
+.transition-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.transition-hover:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 30px rgba(21, 128, 61, 0.15) !important;
+}
