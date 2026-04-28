@@ -35,9 +35,18 @@ export class AuthService {
     private readonly router: Router
   ) {}
 
-  login(username: string, password: string): Observable<AuthResponse> {
+login(username: string, password: string): Observable<AuthResponse> {
+    const credentials = `${username}:${password}`;
+    
+    const safeBase64 = btoa(
+      new Uint8Array(new TextEncoder().encode(credentials)).reduce(
+        (data, byte) => data + String.fromCharCode(byte),
+        ''
+      )
+    );
+  
     const headers = new HttpHeaders({
-      Authorization: `Basic ${btoa(`${username}:${password}`)}`,
+      Authorization: `Basic ${safeBase64}`,
     });
 
     return this.http
