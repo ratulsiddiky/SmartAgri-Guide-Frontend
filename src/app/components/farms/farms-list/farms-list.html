@@ -114,19 +114,21 @@
                 [routerLink]="['/farms', farm._id, 'edit']">
                 Edit Farm
               </a>
-              <button
-                type="button"
-                class="btn btn-outline-danger btn-sm"
-                (click)="deleteFarm(farm)"
-                [disabled]="deletingFarmId === farm._id"
-              >
-                @if (deletingFarmId === farm._id) {
-                  <span class="spinner-border spinner-border-sm me-1"></span>
-                  Deleting...
-                } @else {
-                  Delete
-                }
-              </button>
+              @if (authService.getRole() === 'admin') {
+                <button
+                  type="button"
+                  class="btn btn-outline-danger btn-sm"
+                  (click)="deleteFarm(farm)"
+                  [disabled]="deletingFarmId === farm._id"
+                >
+                  @if (deletingFarmId === farm._id) {
+                    <span class="spinner-border spinner-border-sm me-1"></span>
+                    Deleting...
+                  } @else {
+                    Delete
+                  }
+                </button>
+              }
             </div>
           </div>
 

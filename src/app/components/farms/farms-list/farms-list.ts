@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { FarmService } from '../../../services/farm.service';
 import { Farm } from '../../../models/farm.model';
 import { SensorStatusPipe } from '../../../pipes/sensor-status.pipe';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-farms-list',
@@ -26,7 +27,10 @@ export class FarmsList implements OnInit {
   errorMessage = '';
   deletingFarmId = '';
 
-  constructor(private readonly farmService: FarmService) {}
+  constructor(
+    private readonly farmService: FarmService,
+    public readonly authService: AuthService // <-- ADD THIS LINE
+  ) {}
 
   private getErrorMessage(error: unknown, fallback: string): string {
     const backendMessage = (error as { error?: { message?: unknown } } | null)?.error
@@ -37,16 +41,12 @@ export class FarmsList implements OnInit {
       : fallback;
   }
 
-  /**
-   * Loads the first page of farm records when the view is initialized.
-   */
+
   ngOnInit(): void {
     this.loadFarms();
   }
 
-  /**
-   * Loads a farm page from the backend and updates list state.
-   */
+
   loadFarms(page = this.page): void {
     this.loading = true;
     this.error = false;
@@ -77,9 +77,7 @@ export class FarmsList implements OnInit {
     });
   }
 
-  /**
-   * Executes a server-side farm search using the current query.
-   */
+
   onSearch(): void {
     const searchTerm = this.query.trim();
 
@@ -117,9 +115,7 @@ export class FarmsList implements OnInit {
     });
   }
 
-  /**
-   * Clears the current search term and restores paginated browsing.
-   */
+
   clearSearch(): void {
     if (!this.query) {
       return;
@@ -129,34 +125,26 @@ export class FarmsList implements OnInit {
     this.loadFarms(1);
   }
 
-  /**
-   * Re-applies sorting to the currently displayed farm data.
-   */
+
   onSortChange(): void {
     this.farms = this.sortFarms(this.farms);
   }
 
-  /**
-   * Moves to the next farm page when available.
-   */
+
   nextPage(): void {
     if (!this.query.trim() && this.hasNext && !this.loading) {
       this.loadFarms(this.page + 1);
     }
   }
 
-  /**
-   * Moves to the previous farm page when available.
-   */
+
   previousPage(): void {
     if (!this.query.trim() && this.page > 1 && !this.loading) {
       this.loadFarms(this.page - 1);
     }
   }
 
-  /**
-   * Confirms and deletes a farm record, then refreshes the visible list.
-   */
+
   deleteFarm(farm: Farm): void {
     const farmId = farm._id || '';
     const farmName = farm.farm_name || 'this farm';
@@ -199,9 +187,7 @@ export class FarmsList implements OnInit {
     });
   }
 
-  /**
-   * Applies list sorting rules selected by the user.
-   */
+
   private sortFarms(farms: Farm[]): Farm[] {
     const sorted = [...farms];
 
