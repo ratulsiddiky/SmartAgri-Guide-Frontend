@@ -33,12 +33,10 @@ export class FarmDetail implements OnInit {
   loading = true;
   error = false;
   errorMessage = '';
-
   syncLoading = false;
   syncMessage = '';
   toastMessage = '';
   toastType: 'success' | 'danger' = 'success';
-
   showSensorForm = false;
   newSensor: FarmSensor = { sensor_id: '', type: '' };
   sensorMessage = '';
@@ -51,7 +49,6 @@ export class FarmDetail implements OnInit {
   private getErrorMessage(error: unknown, fallback: string): string {
     const backendMessage = (error as { error?: { message?: unknown } } | null)?.error
       ?.message;
-
     return typeof backendMessage === 'string' && backendMessage.trim()
       ? backendMessage
       : fallback;
@@ -61,14 +58,8 @@ export class FarmDetail implements OnInit {
     return this.route.snapshot.paramMap.get('id') || '';
   }
 
-  /**
-   * Initializes farm detail state and loads intelligence widgets.
-   */
+  // Lifecycle hook now only handles initialization
   ngOnInit() {
-    this.loading = true;
-    this.error = false;
-    this.errorMessage = '';
-
     if (!this.farmId || this.farmId === 'undefined') {
       this.error = true;
       this.errorMessage =
@@ -76,6 +67,14 @@ export class FarmDetail implements OnInit {
       this.loading = false;
       return;
     }
+    this.loadFarmData(); // Call the dedicated refresh method
+  }
+
+  // Extracted logic into a reusable method
+  private loadFarmData(): void {
+    this.loading = true;
+    this.error = false;
+    this.errorMessage = '';
 
     this.farmService
       .getFarmById(this.farmId)
@@ -97,9 +96,6 @@ export class FarmDetail implements OnInit {
       });
   }
 
-  /**
-   * Loads weather insight dashboard values for this farm.
-   */
   loadInsights() {
     this.farmService.getFarmInsights(this.farmId).subscribe({
       next: (data) => (this.insights = data.dashboard_data as FarmInsights),
@@ -114,9 +110,6 @@ export class FarmDetail implements OnInit {
     });
   }
 
-  /**
-   * Loads irrigation status from the smart irrigation endpoint.
-   */
   loadIrrigation() {
     this.farmService.checkIrrigation(this.farmId).subscribe({
       next: (data) => (this.irrigation = data as IrrigationStatus),
@@ -131,19 +124,15 @@ export class FarmDetail implements OnInit {
     });
   }
 
-  /**
-   * Triggers weather synchronization and refreshes intelligence cards.
-   */
   syncWeather() {
     this.syncLoading = true;
     this.syncMessage = '';
-
     this.farmService.syncWeather(this.farmId).subscribe({
       next: () => {
         this.syncMessage = '✅ Weather synced successfully.';
         this.showToast('Weather synced successfully.', 'success');
         this.syncLoading = false;
-        this.ngOnInit();
+        this.loadFarmData(); // Replaced this.ngOnInit() with this.loadFarmData()
       },
       error: (err) => {
         const message = this.getErrorMessage(
@@ -157,21 +146,17 @@ export class FarmDetail implements OnInit {
     });
   }
 
-  /**
-   * Adds a new sensor and refreshes farm intelligence data.
-   */
   addSensor() {
     if (!this.newSensor.sensor_id || !this.newSensor.type) {
       this.sensorMessage = 'Please fill in both fields.';
       return;
     }
-
     this.farmService.addSensor(this.farmId, this.newSensor).subscribe({
       next: () => {
         this.sensorMessage = 'Sensor added successfully.';
         this.showSensorForm = false;
         this.newSensor = { sensor_id: '', type: '' };
-        this.ngOnInit();
+        this.loadFarmData(); // Replaced this.ngOnInit() with this.loadFarmData()
       },
       error: (err) => {
         this.sensorMessage = this.getErrorMessage(
@@ -188,7 +173,6 @@ export class FarmDetail implements OnInit {
   showToast(message: string, type: 'success' | 'danger'): void {
     this.toastMessage = message;
     this.toastType = type;
-
     window.setTimeout(() => {
       this.toastMessage = '';
     }, 2500);

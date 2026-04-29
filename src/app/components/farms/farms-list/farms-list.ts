@@ -29,7 +29,7 @@ export class FarmsList implements OnInit {
 
   constructor(
     private readonly farmService: FarmService,
-    public readonly authService: AuthService // <-- ADD THIS LINE
+    public readonly authService: AuthService
   ) {}
 
   private getErrorMessage(error: unknown, fallback: string): string {
